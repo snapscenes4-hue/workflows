@@ -1,95 +1,85 @@
-import anthropic
+import sys
+print(f"Python version: {sys.version}")
+
+try:
+    import anthropic
+    print(f"Anthropic SDK version: {anthropic.__version__}")
+except ImportError as e:
+    print(f"ERROR importing anthropic: {e}")
+    sys.exit(1)
+
 import os
 import datetime
-import sys
 
 AGENT_ID = "agt_011CaqNdUSAnH7rBgBGkXR4z"
 ENVIRONMENT_ID = "env_018fWQY1wVF6FdfscF3RSxLT"
 
-def is_market_open():
-    today = datetime.date.today()
-    if today.weekday() >= 5:
-        print(f"Market closed today ({today.strftime('%A')}). Skipping.")
-        return False
-    return True
+api_key = os.environ.get("ANTHROPIC_API_KEY", "")
+print(f"API key set: {bool(api_key)} | Length: {len(api_key)}")
 
-def run_trading_session():
-    if not is_market_open():
-        print("Skipping — market closed.")
-        return
+if not api_key:
+    print("ERROR: ANTHROPIC_API_KEY is empty or not set.")
+    sys.exit(1)
 
-    api_key = os.environ.get("ANTHROPIC_API_KEY")
-    if not api_key:
-        print("ERROR: ANTHROPIC_API_KEY secret not set in GitHub Secrets.")
-        sys.exit(1)
+try:
+    client = anthropic.Anthropic(api_key=api_key)
+    print("Client created OK.")
 
-    print(f"API key found. Length: {len(api_key)}")
+    print("Creating session...")
+    session = client.beta.sessions.create(
+        agent=AGENT_ID,
+        environment_id=ENVIRONMENT_ID,
+        title=f"Trading Session {datetime.date.today().isoformat()}",
+    )
+    print(f"Session created: {session.id}")
 
-    try:
-        client = anthropic.Anthropic(api_key=api_key)
-
-        print(f"Creating trading session — {datetime.datetime.now()}")
-
-        session = client.beta.sessions.create(
-            agent=AGENT_ID,
-            environment_id=ENVIRONMENT_ID,
-            title=f"Trading Session {datetime.date.today().isoformat()}",
-        )
-        print(f"Session created: {session.id}")
-
-        client.beta.sessions.events.send(
-            session_id=session.id,
-            events=[{
-                "type": "user.message",
-                "content": [{
-                    "type": "text",
-                    "text": (
-                        f"NYSE is now open. Today is {datetime.date.today().isoformat()}. "
-                        "Bootstrap your environment, check trading mode, authenticate with Questrade, "
-                        "then begin your 5-minute trading cycle loop until 4:00 PM ET. "
-                        "Log everything. No human will intervene — operate fully autonomously."
-                    )
-                }]
+    print("Sending kickoff message...")
+    client.beta.sessions.events.send(
+        session_id=session.id,
+        events=[{
+            "type": "user.message",
+            "content": [{
+                "type": "text",
+                "text": (
+                    f"NYSE is now open. Today is {datetime.date.today().isoformat()}. "
+                    "Bootstrap your environment, check trading mode, authenticate with Questrade, "
+                    "then begin your 5-minute trading cycle loop until 4:00 PM ET. "
+                    "Log everything. No human will intervene — operate fully autonomously."
+                )
             }]
-        )
-        print("Kickoff message sent. Agent is now running.")
+        }]
+    )
+    print("Kickoff sent. Streaming events...")
 
-        for event in client.beta.sessions.events.stream(session_id=session.id):
-            event_type = getattr(event, 'type', str(event))
+    for event in client.beta.sessions.events.stream(session_id=session.id):
+        event_type = getattr(event, 'type', str(event))
+        print(f"[EVENT] {event_type}")
 
-            if 'agent.message' in str(event_type):
-                content = getattr(event, 'content', [])
-                for block in content:
-                    text = getattr(block, 'text', '')
-                    if text:
-                        print(f"[AGENT] {text[:300]}")
+        if 'agent.message' in str(event_type):
+            content = getattr(event, 'content', [])
+            for block in content:
+                text = getattr(block, 'text', '')
+                if text:
+                    print(f"[AGENT] {text[:200]}")
 
-            elif 'agent.tool_use' in str(event_type):
-                name = getattr(event, 'name', 'unknown')
-                print(f"[TOOL] {name}")
+        elif 'agent.tool_use' in str(event_type):
+            print(f"[TOOL] {getattr(event, 'name', 'unknown')}")
 
-            elif 'session.status_idle' in str(event_type):
-                stop = getattr(event, 'stop_reason', {})
-                stop_type = getattr(stop, 'type', '') if stop else ''
-                if stop_type != 'requires_action':
-                    print("Session completed for today.")
-                    break
-
-            elif 'session.error' in str(event_type):
-                print(f"[ERROR] {event}")
+        elif 'session.status_idle' in str(event_type):
+            stop = getattr(event, 'stop_reason', {})
+            stop_type = getattr(stop, 'type', '') if stop else ''
+            if stop_type != 'requires_action':
+                print("Session complete.")
                 break
 
-        print(f"Done — {datetime.datetime.now()}")
+        elif 'session.error' in str(event_type):
+            print(f"[ERROR] {event}")
+            break
 
-    except anthropic.AuthenticationError:
-        print("ERROR: Invalid Anthropic API key. Check your GitHub Secret.")
-        sys.exit(1)
-    except anthropic.APIError as e:
-        print(f"ERROR: Anthropic API error — {e}")
-        sys.exit(1)
-    except Exception as e:
-        print(f"ERROR: Unexpected error — {type(e).__name__}: {e}")
-        sys.exit(1)
+    print("Done.")
 
-if __name__ == "__main__":
-    run_trading_session()
+except Exception as e:
+    print(f"FATAL ERROR: {type(e).__name__}: {e}")
+    import traceback
+    traceback.print_exc()
+    sys.exit(1)
