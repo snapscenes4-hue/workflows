@@ -1,1 +1,26 @@
+name: Trading Bot - NYSE Open Trigger
 
+on:
+  schedule:
+    - cron: '30 13 * * 1-5'
+    - cron: '30 14 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  trigger-trading-session:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install anthropic
+
+      - name: Run Trading Session
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python trading_trigger.py
