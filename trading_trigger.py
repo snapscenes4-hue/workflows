@@ -4,6 +4,7 @@ import datetime
 
 AGENT_ID = "agent_011Cap12j53tSWAWcgfi8Nbw"
 ENVIRONMENT_ID = "env_018fWQY1wVF6FdfscF3RSxLT"
+ACCOUNT_NUMBER = "53826201"
 
 print(f"Python version: {sys.version}")
 print(f"Agent ID: {AGENT_ID}")
@@ -21,6 +22,13 @@ print(f"API key set: {bool(api_key)} | Length: {len(api_key)}")
 
 if not api_key:
     print("ERROR: ANTHROPIC_API_KEY is empty.")
+    sys.exit(1)
+
+questrade_token = os.environ.get("QUESTRADE_REFRESH_TOKEN", "")
+print(f"Questrade token set: {bool(questrade_token)} | Length: {len(questrade_token)}")
+
+if not questrade_token:
+    print("ERROR: QUESTRADE_REFRESH_TOKEN is empty.")
     sys.exit(1)
 
 try:
@@ -42,8 +50,12 @@ try:
             "content": [{
                 "type": "text",
                 "text": (
-                    f"NYSE is now open. Today is {datetime.date.today().isoformat()}. "
-                    "Bootstrap your environment, check trading mode, authenticate with Questrade, "
+                    f"NYSE is now open. Today is {datetime.date.today().isoformat()}.\n\n"
+                    f"Questrade refresh token for this session: {questrade_token}\n"
+                    f"Account number: {ACCOUNT_NUMBER}\n\n"
+                    "Bootstrap your environment using STEP 1, then authenticate with Questrade "
+                    "using the refresh token above (write it to "
+                    "/workspace/trading/auth/questrade_token.json), fetch account info, "
                     "then begin your 5-minute trading cycle loop until 4:00 PM ET. "
                     "Log everything. No human will intervene — operate fully autonomously."
                 )
