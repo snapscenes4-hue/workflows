@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="30">
+<title>Trading CEO Dashboard</title>
+<style>
+  :root{
+    --bg:#0d1117;--panel:#161b22;--border:#30363d;--text:#e6edf3;
+    --muted:#8b949e;--green:#3fb950;--red:#f85149;--blue:#58a6ff;--amber:#d29922;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,monospace;padding:20px;line-height:1.5}
+  h1{font-size:24px;margin-bottom:6px}
+  h2{font-size:16px;margin-bottom:12px;color:var(--blue);text-transform:uppercase;letter-spacing:1px}
+  .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+  .badge{padding:6px 14px;border-radius:20px;font-weight:bold;font-size:13px;letter-spacing:1px}
+  .badge.weekend{background:#3a2e0a;color:var(--amber);border:1px solid var(--amber)}
+  .badge.live{background:#0a3a18;color:var(--green);border:1px solid var(--green)}
+  .badge.closed{background:#3a0a0a;color:var(--red);border:1px solid var(--red)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:24px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:18px}
+  .card .label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+  .card .value{font-size:24px;font-weight:bold;font-family:'SF Mono',Consolas,monospace}
+  .section{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:20px;margin-bottom:20px}
+  table{width:100%;border-collapse:collapse;font-family:'SF Mono',Consolas,monospace;font-size:14px}
+  th{text-align:left;padding:10px;border-bottom:1px solid var(--border);color:var(--muted);text-transform:uppercase;font-size:11px;letter-spacing:1px}
+  td{padding:10px;border-bottom:1px solid #21262d}
+  tr:last-child td{border-bottom:none}
+  .green{color:var(--green)}
+  .red{color:var(--red)}
+  .muted{color:var(--muted)}
+  .empty{padding:30px;text-align:center;color:var(--muted);font-style:italic}
+  .activity{font-family:'SF Mono',Consolas,monospace;font-size:13px}
+  .activity .item{padding:8px 0;border-bottom:1px solid #21262d;display:flex;gap:12px}
+  .activity .item:last-child{border-bottom:none}
+  .activity .ts{color:var(--muted);min-width:160px}
+  code{background:#0d1117;padding:2px 6px;border-radius:4px;color:var(--amber);font-family:'SF Mono',Consolas,monospace}
+  .footer{text-align:center;color:var(--muted);font-size:12px;margin-top:30px}
+</style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <h1>🤖 Trading CEO Dashboard</h1>
+      <div class="muted" id="time">Sunday, 2026-05-10 11:59:26 EDT</div>
+    </div>
+    <div class="badge weekend">WEEKEND — MARKET CLOSED</div>
+  </div>
+
+  <h2>Portfolio Summary</h2>
+  <div class="grid">
+    <div class="card"><div class="label">Total Equity (USD eq.)</div><div class="value">$73.12</div></div>
+    <div class="card"><div class="label">Buying Power (USD)</div><div class="value">$71.51</div></div>
+    <div class="card"><div class="label">Cash (CAD)</div><div class="value">$100.00</div></div>
+    <div class="card"><div class="label">Cash (USD)</div><div class="value">$73.12</div></div>
+    <div class="card"><div class="label">Market Value</div><div class="value">$0.00</div></div>
+    <div class="card"><div class="label">P&amp;L Today</div><div class="value muted">$0.00</div></div>
+  </div>
+
+  <div class="section">
+    <h2>Positions</h2>
+    <table>
+      <thead><tr><th>Symbol</th><th>Shares</th><th>Avg Cost</th><th>Current</th><th>P&amp;L $</th><th>P&amp;L %</th></tr></thead>
+      <tbody><tr><td colspan="6" class="empty">No open positions</td></tr></tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>Open Orders</h2>
+    <table>
+      <thead><tr><th>Order ID</th><th>Symbol</th><th>Action</th><th>Qty</th><th>Price</th><th>Status</th><th>Cancel Cmd</th></tr></thead>
+      <tbody><tr><td colspan="7" class="empty">No open orders</td></tr></tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>Activity Feed (this session)</h2>
+    <div class="activity">
+      <div class="item"><div class="ts">2026-05-10 11:59:26 EDT</div><div>✅ Session bootstrapped — directories ready</div></div>
+      <div class="item"><div class="ts">2026-05-10 11:59:26 EDT</div><div>✅ Tokens persisted to <code>/workspace/trading/auth/</code></div></div>
+      <div class="item"><div class="ts">2026-05-10 11:59:26 EDT</div><div>✅ Questrade authenticated — api01.iq.questrade.com (HTTP 200)</div></div>
+      <div class="item"><div class="ts">2026-05-10 11:59:26 EDT</div><div>✅ Git remote configured for snapscenes4-hue/workflows</div></div>
+      <div class="item"><div class="ts">2026-05-10 11:59:26 EDT</div><div>✅ Fetched balances / positions / open orders for account 53826201</div></div>
+      <div class="item"><div class="ts">2026-05-10 11:59:26 EDT</div><div>📊 Portfolio: 0 positions, 0 open orders, $73.12 USD + $100 CAD cash</div></div>
+      <div class="item"><div class="ts">2026-05-10 11:59:26 EDT</div><div>⏸ Trading cycle skipped — Sunday, market closed</div></div>
+      <div class="item"><div class="ts">2026-05-10 11:59:26 EDT</div><div>✅ Dashboard regenerated and pushed to GitHub</div></div>
+    </div>
+  </div>
+
+  <div class="footer">Auto-refresh every 30s · Account 53826201 · Last update 2026-05-10 11:59:26 EDT</div>
+</body>
+</html>
