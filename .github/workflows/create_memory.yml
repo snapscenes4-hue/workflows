@@ -1,0 +1,23 @@
+name: Create Memory Store
+
+on:
+  workflow_dispatch:
+
+jobs:
+  create-memory:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install "anthropic>=0.92.0"
+
+      - name: Create Memory Store
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python create_memory.py 2>&1
