@@ -2,92 +2,338 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="refresh" content="30">
-<title>Trading CEO Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="refresh" content="60">
+<title>🤖 Trading CEO Agent Dashboard</title>
 <style>
-  :root{
-    --bg:#0d1117;--panel:#161b22;--border:#30363d;--text:#e6edf3;
-    --muted:#8b949e;--green:#3fb950;--red:#f85149;--blue:#58a6ff;--amber:#d29922;
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+    background: #0d1117;
+    color: #c9d1d9;
+    min-height: 100vh;
+    padding: 16px;
+    line-height: 1.5;
   }
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,monospace;padding:20px;line-height:1.5}
-  h1{font-size:24px;margin-bottom:6px}
-  h2{font-size:16px;margin-bottom:12px;color:var(--blue);text-transform:uppercase;letter-spacing:1px}
-  .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border)}
-  .badge{padding:6px 14px;border-radius:20px;font-weight:bold;font-size:13px;letter-spacing:1px}
-  .badge.weekend{background:#3a2e0a;color:var(--amber);border:1px solid var(--amber)}
-  .badge.live{background:#0a3a18;color:var(--green);border:1px solid var(--green)}
-  .badge.closed{background:#3a0a0a;color:var(--red);border:1px solid var(--red)}
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:24px}
-  .card{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:18px}
-  .card .label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
-  .card .value{font-size:24px;font-weight:bold;font-family:'SF Mono',Consolas,monospace}
-  .section{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:20px;margin-bottom:20px}
-  table{width:100%;border-collapse:collapse;font-family:'SF Mono',Consolas,monospace;font-size:14px}
-  th{text-align:left;padding:10px;border-bottom:1px solid var(--border);color:var(--muted);text-transform:uppercase;font-size:11px;letter-spacing:1px}
-  td{padding:10px;border-bottom:1px solid #21262d}
-  tr:last-child td{border-bottom:none}
-  .green{color:var(--green)}
-  .red{color:var(--red)}
-  .muted{color:var(--muted)}
-  .empty{padding:30px;text-align:center;color:var(--muted);font-style:italic}
-  .activity{font-family:'SF Mono',Consolas,monospace;font-size:13px}
-  .activity .item{padding:8px 0;border-bottom:1px solid #21262d;display:flex;gap:12px}
-  .activity .item:last-child{border-bottom:none}
-  .activity .ts{color:var(--muted);min-width:160px}
-  code{background:#0d1117;padding:2px 6px;border-radius:4px;color:var(--amber);font-family:'SF Mono',Consolas,monospace}
-  .footer{text-align:center;color:var(--muted);font-size:12px;margin-top:30px}
+  .container { max-width: 1400px; margin: 0 auto; }
+  header {
+    background: linear-gradient(135deg, #161b22, #0d1117);
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  h1 { color: #58a6ff; font-size: 1.6rem; }
+  h2 { color: #58a6ff; font-size: 1.2rem; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #30363d; }
+  .badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+  }
+  .badge-weekend { background: #1f6feb33; color: #58a6ff; border: 1px solid #1f6feb; }
+  .badge-live { background: #00ff8833; color: #00ff88; border: 1px solid #00ff88; }
+  .badge-closed { background: #ff444433; color: #ff4444; border: 1px solid #ff4444; }
+  .grid { display: grid; gap: 16px; }
+  .grid-2 { grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); }
+  .grid-4 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+  .card {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 16px;
+  }
+  .stat {
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 14px;
+  }
+  .stat-label { font-size: 0.75rem; color: #8b949e; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-value { font-size: 1.4rem; font-weight: bold; color: #c9d1d9; margin-top: 4px; }
+  .green { color: #00ff88; }
+  .red { color: #ff4444; }
+  .blue { color: #58a6ff; }
+  .yellow { color: #f0883e; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid #21262d; }
+  th { color: #58a6ff; font-weight: 600; text-transform: uppercase; font-size: 0.72rem; letter-spacing: 0.5px; }
+  tr:hover td { background: #1c2128; }
+  .pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.72rem;
+    font-weight: bold;
+  }
+  .pill-strong { background: #00ff8833; color: #00ff88; border: 1px solid #00ff88; }
+  .pill-moderate { background: #f0883e33; color: #f0883e; border: 1px solid #f0883e; }
+  .pill-weak { background: #8b949e33; color: #8b949e; border: 1px solid #8b949e; }
+  .news-item { padding: 10px 0; border-bottom: 1px solid #21262d; }
+  .news-item:last-child { border-bottom: none; }
+  .news-source { font-size: 0.75rem; color: #8b949e; }
+  .activity-feed { max-height: 320px; overflow-y: auto; }
+  .activity-item { padding: 8px 0; border-bottom: 1px solid #21262d; font-size: 0.85rem; }
+  code { background: #0d1117; padding: 2px 6px; border-radius: 4px; color: #58a6ff; font-size: 0.8rem; }
+  .empty { color: #8b949e; font-style: italic; padding: 14px; text-align: center; }
+  .reasoning { background: #0d1117; padding: 12px; border-radius: 6px; border-left: 3px solid #58a6ff; margin-top: 8px; font-size: 0.88rem; }
+  .footer { text-align: center; color: #8b949e; font-size: 0.78rem; margin-top: 24px; }
 </style>
 </head>
 <body>
-  <div class="header">
+<div class="container">
+
+<header>
+  <div>
+    <h1>🤖 Autonomous Trading CEO Agent</h1>
+    <div style="color:#8b949e; font-size:0.9rem; margin-top:4px;">Questrade • TFSA Account 53826201 • Live Self-Driving</div>
+  </div>
+  <div style="text-align:right;">
+    <div class="badge badge-weekend">📅 WEEKEND — MARKETS CLOSED</div>
+    <div style="color:#8b949e; margin-top:8px; font-size:0.85rem;">
+      Sunday, May 10, 2026 • 12:43 PM ET<br>
+      Last updated: 2026-05-10 16:43:32 UTC
+    </div>
+  </div>
+</header>
+
+<!-- PORTFOLIO SUMMARY -->
+<section class="card">
+  <h2>💼 Portfolio Summary (TFSA)</h2>
+  <div class="grid grid-4">
+    <div class="stat">
+      <div class="stat-label">Total Equity (CAD)</div>
+      <div class="stat-value blue">$100.00</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Total Equity (USD)</div>
+      <div class="stat-value blue">$73.12</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Buying Power (CAD)</div>
+      <div class="stat-value">$100.00</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Buying Power (USD)</div>
+      <div class="stat-value">$71.51</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Cash (CAD)</div>
+      <div class="stat-value">$100.00</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Cash (USD)</div>
+      <div class="stat-value">$73.12</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">P&L Today</div>
+      <div class="stat-value">$0.00 (0.00%)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Trades Today</div>
+      <div class="stat-value">0</div>
+    </div>
+  </div>
+</section>
+
+<!-- LIVE MARKET NEWS -->
+<section class="card">
+  <h2>📰 Live Market News</h2>
+  <div class="grid grid-2">
     <div>
-      <h1>🤖 Trading CEO Dashboard</h1>
-      <div class="muted" id="time">Sunday, 2026-05-10 11:59:26 EDT</div>
+      <h3 style="color:#58a6ff; margin-bottom:10px;">📊 Market Indices (Friday Close)</h3>
+      <table>
+        <thead><tr><th>Index</th><th>Level</th><th>Chg %</th></tr></thead>
+        <tbody>
+          <tr><td>S&amp;P 500</td><td>7,398.93</td><td class="green">+0.84%</td></tr>
+          <tr><td>Nasdaq Composite</td><td>26,247.08</td><td class="green">+1.71%</td></tr>
+          <tr><td>Dow Jones</td><td>49,609.16</td><td class="green">+0.02%</td></tr>
+          <tr><td>Bitcoin (BTC)</td><td>$80,292</td><td class="green">+0.26%</td></tr>
+          <tr><td>Ethereum (ETH)</td><td>$2,320</td><td class="green">+0.23%</td></tr>
+          <tr><td>Brent Oil</td><td>$99.12</td><td class="red">-2.87%</td></tr>
+          <tr><td>Gold</td><td>$4,621.90</td><td class="red">-2.29%</td></tr>
+        </tbody>
+      </table>
     </div>
-    <div class="badge weekend">WEEKEND — MARKET CLOSED</div>
-  </div>
-
-  <h2>Portfolio Summary</h2>
-  <div class="grid">
-    <div class="card"><div class="label">Total Equity (USD eq.)</div><div class="value">$73.12</div></div>
-    <div class="card"><div class="label">Buying Power (USD)</div><div class="value">$71.51</div></div>
-    <div class="card"><div class="label">Cash (CAD)</div><div class="value">$100.00</div></div>
-    <div class="card"><div class="label">Cash (USD)</div><div class="value">$73.12</div></div>
-    <div class="card"><div class="label">Market Value</div><div class="value">$0.00</div></div>
-    <div class="card"><div class="label">P&amp;L Today</div><div class="value muted">$0.00</div></div>
-  </div>
-
-  <div class="section">
-    <h2>Positions</h2>
-    <table>
-      <thead><tr><th>Symbol</th><th>Shares</th><th>Avg Cost</th><th>Current</th><th>P&amp;L $</th><th>P&amp;L %</th></tr></thead>
-      <tbody><tr><td colspan="6" class="empty">No open positions</td></tr></tbody>
-    </table>
-  </div>
-
-  <div class="section">
-    <h2>Open Orders</h2>
-    <table>
-      <thead><tr><th>Order ID</th><th>Symbol</th><th>Action</th><th>Qty</th><th>Price</th><th>Status</th><th>Cancel Cmd</th></tr></thead>
-      <tbody><tr><td colspan="7" class="empty">No open orders</td></tr></tbody>
-    </table>
-  </div>
-
-  <div class="section">
-    <h2>Activity Feed (this session)</h2>
-    <div class="activity">
-      <div class="item"><div class="ts">2026-05-10 11:59:26 EDT</div><div>✅ Session bootstrapped — directories ready</div></div>
-      <div class="item"><div class="ts">2026-05-10 11:59:26 EDT</div><div>✅ Tokens persisted to <code>/workspace/trading/auth/</code></div></div>
-      <div class="item"><div class="ts">2026-05-10 11:59:26 EDT</div><div>✅ Questrade authenticated — api01.iq.questrade.com (HTTP 200)</div></div>
-      <div class="item"><div class="ts">2026-05-10 11:59:26 EDT</div><div>✅ Git remote configured for snapscenes4-hue/workflows</div></div>
-      <div class="item"><div class="ts">2026-05-10 11:59:26 EDT</div><div>✅ Fetched balances / positions / open orders for account 53826201</div></div>
-      <div class="item"><div class="ts">2026-05-10 11:59:26 EDT</div><div>📊 Portfolio: 0 positions, 0 open orders, $73.12 USD + $100 CAD cash</div></div>
-      <div class="item"><div class="ts">2026-05-10 11:59:26 EDT</div><div>⏸ Trading cycle skipped — Sunday, market closed</div></div>
-      <div class="item"><div class="ts">2026-05-10 11:59:26 EDT</div><div>✅ Dashboard regenerated and pushed to GitHub</div></div>
+    <div>
+      <h3 style="color:#58a6ff; margin-bottom:10px;">🚀 Top Movers</h3>
+      <table>
+        <thead><tr><th>Symbol</th><th>Chg %</th><th>Reason</th></tr></thead>
+        <tbody>
+          <tr><td>INOD</td><td class="green">+86.0%</td><td>Top gainer</td></tr>
+          <tr><td>RKLB</td><td class="green">+34.2%</td><td>Rocket Lab momentum</td></tr>
+          <tr><td>FLNC</td><td class="green">+27.4%</td><td>HSBC/Roth upgrades on EBITDA beat</td></tr>
+          <tr><td>AKAM</td><td class="green">+26.6%</td><td>$1.8B/7yr AI cloud deal</td></tr>
+          <tr><td>MU</td><td class="green">+15.0%</td><td>AI memory supercycle</td></tr>
+          <tr><td>SNDK</td><td class="green">+16.0%</td><td>AI memory supercycle</td></tr>
+          <tr><td>NET</td><td class="red">-14.0%</td><td>Cloudflare layoffs</td></tr>
+          <tr><td>TTD</td><td class="red">-13.0%</td><td>Trade Desk guidance miss</td></tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
-  <div class="footer">Auto-refresh every 30s · Account 53826201 · Last update 2026-05-10 11:59:26 EDT</div>
+  <div class="grid grid-2" style="margin-top:18px;">
+    <div>
+      <h3 style="color:#58a6ff; margin-bottom:10px;">🔥 Breaking News</h3>
+      <div class="news-item">
+        <strong>S&amp;P 500 extends 6-week win streak</strong>
+        <div class="news-source">CNBC • May 8, 2026 — Both S&amp;P and Nasdaq closed at all-time records</div>
+      </div>
+      <div class="news-item">
+        <strong>Memory chip 'supercycle' — stocks +30% in a week</strong>
+        <div class="news-source">CNBC • May 9, 2026 — AI demand fueling Micron, Sandisk, Samsung rally</div>
+      </div>
+      <div class="news-item">
+        <strong>Michael Burry: Market like '1999-2000 bubble'</strong>
+        <div class="news-source">CNBC • May 8, 2026 — Big Short investor warns on AI fixation</div>
+      </div>
+      <div class="news-item">
+        <strong>April jobs +115K beats +60K expected; unemp 4.3%</strong>
+        <div class="news-source">Schwab • May 8, 2026 — Healthcare and warehousing led gains</div>
+      </div>
+      <div class="news-item">
+        <strong>Trump-Xi summit is next major deadline</strong>
+        <div class="news-source">CNBC • May 9, 2026 — Investors await US-Iran resolution</div>
+      </div>
+      <div class="news-item">
+        <strong>Drone hits ship near Qatar; Strait of Hormuz tensions</strong>
+        <div class="news-source">Bloomberg • May 9, 2026 — Oil supply buffer eroding, JPM warns</div>
+      </div>
+      <div class="news-item">
+        <strong>Nvidia pushes past $40B in AI equity bets this year</strong>
+        <div class="news-source">CNBC • May 9, 2026 — Embraces role of AI investor</div>
+      </div>
+    </div>
+
+    <div>
+      <h3 style="color:#58a6ff; margin-bottom:10px;">📅 Earnings Calendar (This Week)</h3>
+      <table>
+        <thead><tr><th>Date</th><th>Tickers</th><th>Note</th></tr></thead>
+        <tbody>
+          <tr><td>Mon May 11</td><td>CEG, CRCL</td><td>Constellation, Circle Internet</td></tr>
+          <tr><td>Tue May 12</td><td>JD</td><td>JD.com + April CPI</td></tr>
+          <tr><td>Wed May 13</td><td>BABA, CSCO</td><td>Alibaba, Cisco + April PPI</td></tr>
+          <tr><td>Thu May 14</td><td>AMAT</td><td>Applied Materials + Retail Sales</td></tr>
+          <tr><td>Fri May 15</td><td>—</td><td>Industrial Production; Fed Chair turnover</td></tr>
+        </tbody>
+      </table>
+
+      <h3 style="color:#58a6ff; margin:20px 0 10px;">🏦 Macro / Fed</h3>
+      <div class="news-item">
+        <strong>Fed Funds Rate held at 3.50%–3.75%</strong>
+        <div class="news-source">Powell's likely final meeting; 4 dissents — unusual divide</div>
+      </div>
+      <div class="news-item">
+        <strong>April CPI release Tuesday May 12 — expected red-hot</strong>
+        <div class="news-source">Energy prices elevated due to Middle East conflict</div>
+      </div>
+      <div class="news-item">
+        <strong>Kevin Warsh expected to succeed Powell as Fed Chair</strong>
+        <div class="news-source">Senate vote likely week of May 11; Powell's term ends May 15</div>
+      </div>
+      <div class="news-item">
+        <strong>Q1 2026 GDP +2.0% annualized</strong>
+        <div class="news-source">Acceleration from 0.5% in Q4 2025</div>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="color:#58a6ff; margin:18px 0 10px;">🌐 Crypto &amp; Global Snapshot</h3>
+  <div class="grid grid-4">
+    <div class="stat"><div class="stat-label">BTC</div><div class="stat-value green">$80,292</div><div style="color:#8b949e;font-size:0.8rem;">+3.0% week</div></div>
+    <div class="stat"><div class="stat-label">ETH</div><div class="stat-value green">$2,320</div><div style="color:#8b949e;font-size:0.8rem;">+1.2% 24h</div></div>
+    <div class="stat"><div class="stat-label">XRP</div><div class="stat-value green">$1.41</div><div style="color:#8b949e;font-size:0.8rem;">+0.94% 24h</div></div>
+    <div class="stat"><div class="stat-label">Total Crypto Mcap</div><div class="stat-value blue">$2.8T</div><div style="color:#8b949e;font-size:0.8rem;">BTC dominance 58.2%</div></div>
+  </div>
+</section>
+
+<!-- CURRENT POSITIONS -->
+<section class="card">
+  <h2>📈 Current Positions</h2>
+  <div class="empty">No open positions. Account funded with $100 CAD + $73.12 USD ready to deploy.</div>
+</section>
+
+<!-- OPEN ORDERS -->
+<section class="card">
+  <h2>📝 Open Orders</h2>
+  <div class="empty">No open orders.</div>
+  <div style="color:#8b949e; font-size:0.78rem; margin-top:8px;">
+    Cancel template: <code>curl -X DELETE https://api01.iq.questrade.com/v1/accounts/53826201/orders/ORDER_ID -H "Authorization: Bearer TOKEN"</code>
+  </div>
+</section>
+
+<!-- RECENT TRADES -->
+<section class="card">
+  <h2>🕒 Recent Trades</h2>
+  <div class="empty">No trades yet this session.</div>
+</section>
+
+<!-- AGENT ANALYSIS -->
+<section class="card">
+  <h2>🔬 Agent Analysis — Top 3 Candidates</h2>
+  <table>
+    <thead><tr><th>Symbol</th><th>Signal</th><th>Reasoning</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>AKAM</strong> @ ~$148</td>
+        <td><span class="pill pill-strong">STRONG</span></td>
+        <td>Akamai surged 24%+ on a $1.8B / 7-year AI lab cloud-infrastructure contract. Cybersecurity + AI dual tailwinds, sustainable revenue stream, undervalued vs. AI peers.</td>
+      </tr>
+      <tr>
+        <td><strong>FLNC</strong> @ ~$24</td>
+        <td><span class="pill pill-strong">STRONG</span></td>
+        <td>Fluence Energy battery storage maker up ~30% on Q2 EBITDA beat with HSBC + Roth Capital double upgrade. Affordable price point fits small account size.</td>
+      </tr>
+      <tr>
+        <td><strong>MU</strong> @ ~mid</td>
+        <td><span class="pill pill-moderate">MODERATE</span></td>
+        <td>AI memory supercycle (+30% week, +15% Friday alone). CNBC flags overbought; Burry warns of bubble. Wait for pullback before entry.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="reasoning">
+    <strong>📌 Today's Decision: NO TRADES (markets closed - weekend)</strong><br>
+    Reasoning: Today is Sunday May 10, 2026. NYSE/NASDAQ closed. Tomorrow's open will be informed by:
+    <ul style="margin-top:8px; padding-left:20px;">
+      <li>Tuesday CPI print — expected hot; if cooler than expected, buy AI/growth on the rip</li>
+      <li>Geopolitical news flow on US-Iran &amp; Trump-Xi summit</li>
+      <li>Whether the 6-week S&amp;P win streak hits exhaustion (Burry-style mean reversion risk)</li>
+      <li>Account size ($100 CAD + $73 USD) constrains us to single-share or fractional trades on cheap names like FLNC</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ACTIVITY FEED -->
+<section class="card">
+  <h2>📋 Session Activity Feed</h2>
+  <div class="activity-feed">
+    <div class="activity-item">🟢 <strong>16:43 UTC</strong> — Bootstrap complete: directories &amp; portfolio.json initialized</div>
+    <div class="activity-item">🔐 <strong>16:43 UTC</strong> — Tokens saved to disk (Questrade refresh + GitHub PAT)</div>
+    <div class="activity-item">✅ <strong>16:43 UTC</strong> — Questrade OAuth refresh succeeded (HTTP 200, api01.iq.questrade.com)</div>
+    <div class="activity-item">⚙️ <strong>16:43 UTC</strong> — Git configured: snapscenes4-hue/workflows.git</div>
+    <div class="activity-item">📊 <strong>16:44 UTC</strong> — Account balances fetched: $100 CAD + $73.12 USD; 0 positions; 0 open orders</div>
+    <div class="activity-item">🌐 <strong>16:44 UTC</strong> — Market research complete: 5 web searches, 3 candidates identified</div>
+    <div class="activity-item">📰 <strong>16:44 UTC</strong> — Top 3 watchlist: AKAM (strong), FLNC (strong), MU (moderate)</div>
+    <div class="activity-item">⏸️ <strong>16:44 UTC</strong> — Trading cycle SKIPPED: weekend (markets closed)</div>
+    <div class="activity-item">🚀 <strong>16:44 UTC</strong> — Dashboard regenerated &amp; pushing to GitHub</div>
+  </div>
+</section>
+
+<div class="footer">
+  Auto-refresh every 60 seconds • Trading CEO Agent v1 • Self-driving since cycle 0<br>
+  Risk rules: max 5% per trade • 2% hard stop-loss • Never exceed buying power
+</div>
+
+</div>
 </body>
 </html>
