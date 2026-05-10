@@ -5,10 +5,12 @@ import datetime
 AGENT_ID = "agent_011Cap12j53tSWAWcgfi8Nbw"
 ENVIRONMENT_ID = "env_018fWQY1wVF6FdfscF3RSxLT"
 ACCOUNT_NUMBER = "53826201"
+MEMORY_STORE_ID = "memstore_01FM5ZuZ8dM8L4AnFHXHuZM6"
 
 print(f"Python version: {sys.version}")
 print(f"Agent ID: {AGENT_ID}")
 print(f"Environment ID: {ENVIRONMENT_ID}")
+print(f"Memory Store ID: {MEMORY_STORE_ID}")
 
 try:
     import anthropic
@@ -19,16 +21,20 @@ except ImportError as e:
 
 api_key = os.environ.get("ANTHROPIC_API_KEY", "")
 print(f"API key set: {bool(api_key)} | Length: {len(api_key)}")
-
 if not api_key:
     print("ERROR: ANTHROPIC_API_KEY is empty.")
     sys.exit(1)
 
 questrade_token = os.environ.get("QUESTRADE_REFRESH_TOKEN", "")
 print(f"Questrade token set: {bool(questrade_token)} | Length: {len(questrade_token)}")
-
 if not questrade_token:
     print("ERROR: QUESTRADE_REFRESH_TOKEN is empty.")
+    sys.exit(1)
+
+github_token = os.environ.get("GH_PUSH_TOKEN", "")
+print(f"GitHub token set: {bool(github_token)} | Length: {len(github_token)}")
+if not github_token:
+    print("ERROR: GH_PUSH_TOKEN is empty.")
     sys.exit(1)
 
 try:
@@ -40,6 +46,14 @@ try:
         agent=AGENT_ID,
         environment_id=ENVIRONMENT_ID,
         title=f"Trading Session {datetime.date.today().isoformat()}",
+        resources=[
+            {
+                "type": "memory_store",
+                "memory_store_id": MEMORY_STORE_ID,
+                "access": "read_write",
+                "instructions": "Persistent trading memory — read at startup to load past trades, learnings, watchlist and risk events. Write new learnings after each cycle and at end of day."
+            }
+        ]
     )
     print(f"SUCCESS — Session created: {session.id}")
 
@@ -51,13 +65,14 @@ try:
                 "type": "text",
                 "text": (
                     f"NYSE is now open. Today is {datetime.date.today().isoformat()}.\n\n"
-                    f"Questrade refresh token for this session: {questrade_token}\n"
-                    f"Account number: {ACCOUNT_NUMBER}\n\n"
-                    "Bootstrap your environment using STEP 1, then authenticate with Questrade "
-                    "using the refresh token above (write it to "
-                    "/workspace/trading/auth/questrade_token.json), fetch account info, "
-                    "then begin your 5-minute trading cycle loop until 4:00 PM ET. "
-                    "Log everything. No human will intervene — operate fully autonomously."
+                    f"refresh_token: {questrade_token}\n"
+                    f"account: {ACCOUNT_NUMBER}\n"
+                    f"github_token: {github_token}\n\n"
+                    "Execute ALL 12 steps in order. Start with STEP 1 bootstrap, "
+                    "then STEP 2 read persistent memory, authenticate with Questrade, "
+                    "run market research, generate dashboard, push to GitHub, "
+                    "run trading cycle if market is open, update memory with learnings, "
+                    "and write session summary. No human will intervene — operate fully autonomously."
                 )
             }]
         }]
