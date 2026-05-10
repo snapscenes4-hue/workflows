@@ -1,13 +1,16 @@
 import anthropic
+import os
 
 client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
 
+# Create memory store
 store = client.beta.memory_stores.create(
     name="trading-memory",
     description="Persistent trading memory — stores trading history, strategy learnings, watchlist, and risk events across all sessions."
 )
 print(f"✅ Memory Store ID: {store.id}")
 
+# Seed with initial structure
 memories = [
     ("/trading-history/README.md", "# Trading History\nAll trades recorded here by date."),
     ("/strategy-learnings/notes.md", "# Strategy Learnings\nWhat worked and what didn't."),
@@ -20,3 +23,4 @@ for path, content in memories:
     print(f"✅ Created: {path}")
 
 print(f"\n🎉 Memory Store ID: {store.id}")
+print("Paste this ID back to the builder!")
