@@ -21,17 +21,17 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install "anthropic>=0.92.0"
+        run: pip install "anthropic>=0.92.0" PyNaCl
 
-      - name: Debug environment
+      - name: Rotate Questrade Token
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: |
-          python -c "import anthropic; print('SDK version:', anthropic.__version__)"
-          python -c "import os; key=os.environ.get('ANTHROPIC_API_KEY','NOT SET'); print('Key set:', key != 'NOT SET', '| Length:', len(key) if key != 'NOT SET' else 0)"
+          QUESTRADE_REFRESH_TOKEN: ${{ secrets.QUESTRADE_REFRESH_TOKEN }}
+          GH_PUSH_TOKEN: ${{ secrets.GH_PUSH_TOKEN }}
+        run: python update_questrade_token.py 2>&1
 
       - name: Run Trading Session
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           QUESTRADE_REFRESH_TOKEN: ${{ secrets.QUESTRADE_REFRESH_TOKEN }}
+          GH_PUSH_TOKEN: ${{ secrets.GH_PUSH_TOKEN }}
         run: python trading_trigger.py 2>&1
