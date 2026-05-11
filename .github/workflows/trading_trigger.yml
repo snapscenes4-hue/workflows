@@ -2,7 +2,7 @@ name: Trading Bot - NYSE Open Trigger
 
 on:
   schedule:
-    - cron: '*/5 13-20 * * 1-5'   # Every 5 min, Mon–Fri, 13:00–20:00 UTC (covers 9:30–4:00 ET)
+    - cron: '*/5 13-20 * * 1-5'
   workflow_dispatch:
 
 env:
@@ -20,13 +20,11 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install "anthropic>=0.92.0" PyNaCl
+        run: pip install "anthropic>=0.92.0" PyNaCl requests
 
       - name: Run Trading Session
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           QUESTRADE_REFRESH_TOKEN: ${{ secrets.QUESTRADE_REFRESH_TOKEN }}
           GH_PUSH_TOKEN: ${{ secrets.GH_PUSH_TOKEN }}
-          AGENT_ID: ${{ secrets.TRADING_AGENT_ID }}
-          ENVIRONMENT_ID: ${{ secrets.TRADING_ENVIRONMENT_ID }}
         run: python trading_trigger.py 2>&1
