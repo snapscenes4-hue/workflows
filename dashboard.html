@@ -2,468 +2,613 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="refresh" content="60">
-<title>Trading CEO Agent — Live Terminal</title>
+<title>Trading CEO Agent — Live Dashboard</title>
 <style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
   :root {
     --bg: #0a0e1a;
     --card: #0d1421;
     --card2: #111a2e;
     --border: #1e2d4a;
-    --cyan: #00d4ff;
-    --blue: #3b82f6;
-    --green: #00e676;
-    --red: #ff1744;
-    --orange: #ffa726;
+    --primary: #00d4ff;
+    --secondary: #3b82f6;
+    --profit: #00e676;
+    --loss: #ff1744;
+    --warn: #ffa726;
     --text: #e8eaf0;
-    --muted: #8892a4;
+    --text2: #8892a4;
+    --header-grad: linear-gradient(135deg, #0a0e1a 0%, #0d1f3c 100%);
   }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html,body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:13px;line-height:1.5;min-height:100vh}
-  a{color:var(--cyan);text-decoration:none}
-  .container{max-width:1600px;margin:0 auto;padding:18px}
-
-  /* Top bar */
-  .topbar{
-    display:flex;align-items:center;justify-content:space-between;
-    background:linear-gradient(135deg,#0a0e1a 0%,#0d1f3c 100%);
-    border:1px solid var(--border);border-radius:10px;padding:14px 22px;margin-bottom:18px;
-    box-shadow:0 2px 14px rgba(0,212,255,0.04);
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    min-height: 100vh;
   }
-  .brand{display:flex;align-items:center;gap:12px}
-  .brand-logo{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,#00d4ff,#3b82f6);display:flex;align-items:center;justify-content:center;font-weight:800;color:#0a0e1a;font-size:18px}
-  .brand-name{font-weight:700;font-size:15px;letter-spacing:.3px}
-  .brand-sub{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:1.2px}
-  .status-pill{display:flex;align-items:center;gap:8px;padding:6px 14px;background:rgba(0,212,255,0.06);border:1px solid var(--border);border-radius:20px;font-size:12px;font-weight:600}
-  .pulse{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 0 rgba(0,230,118,.6);animation:pulse 1.4s infinite}
-  .pulse.closed{background:var(--orange);box-shadow:0 0 0 0 rgba(255,167,38,.6)}
-  .pulse.test{background:#888;box-shadow:0 0 0 0 rgba(160,160,160,.6)}
-  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(0,230,118,.55)}70%{box-shadow:0 0 0 10px rgba(0,230,118,0)}100%{box-shadow:0 0 0 0 rgba(0,230,118,0)}}
-  .time-block{text-align:right}
-  .time-block .label{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:1.2px}
-  .time-block .val{font-size:13px;font-weight:600}
-  .countdown{color:var(--cyan)}
+  .topbar {
+    background: var(--header-grad);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .logo small { color: var(--text2); font-weight: 400; font-size: 11px; margin-left: 8px; letter-spacing: 0; -webkit-text-fill-color: var(--text2); }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 16px;
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.3);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+  }
+  .badge .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--profit);
+    box-shadow: 0 0 12px var(--profit);
+    animation: pulse 1.6s infinite;
+  }
+  .badge.closed .dot { background: var(--warn); box-shadow: 0 0 12px var(--warn); }
+  .badge.weekend .dot { background: var(--text2); box-shadow: none; animation: none; }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.3); }
+  }
+  .topbar-right { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-size: 11px; color: var(--text2); }
+  .countdown { color: var(--primary); font-weight: 600; }
+  .container { padding: 20px 24px 40px; max-width: 1600px; margin: 0 auto; }
+  .row { display: grid; gap: 16px; margin-bottom: 16px; }
+  .row.r1 { grid-template-columns: repeat(4, 1fr); }
+  .row.split { grid-template-columns: 2fr 1fr; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: rgba(0,212,255,0.3); }
+  .card-h {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    background: var(--card2);
+  }
+  .card-h h3 {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text2);
+  }
+  .toggle {
+    background: transparent;
+    border: none;
+    color: var(--text2);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: color 0.2s, background 0.2s;
+  }
+  .toggle:hover { color: var(--primary); background: rgba(0,212,255,0.08); }
+  .card-body { padding: 18px; }
+  .card-body.collapsed { display: none; }
 
-  /* Grid */
-  .row{display:grid;gap:14px;margin-bottom:14px}
-  .row-4{grid-template-columns:repeat(4,1fr)}
-  .row-2-1{grid-template-columns:2fr 1fr}
-  @media (max-width:1100px){.row-4{grid-template-columns:repeat(2,1fr)}.row-2-1{grid-template-columns:1fr}}
+  .metric { display: flex; flex-direction: column; gap: 4px; }
+  .metric .value { font-size: 24px; font-weight: 700; color: var(--text); }
+  .metric .sub { font-size: 12px; color: var(--text2); }
+  .metric.profit .value { color: var(--profit); }
+  .metric.loss .value { color: var(--loss); }
 
-  /* Card */
-  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px}
-  .card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-  .card-title{font-size:11px;text-transform:uppercase;letter-spacing:1.4px;color:var(--muted);font-weight:600}
-  .card-action{cursor:pointer;color:var(--muted);background:none;border:none;font-size:14px;padding:2px 6px;border-radius:4px}
-  .card-action:hover{color:var(--cyan);background:rgba(0,212,255,0.08)}
-  .card-body{transition:max-height .2s}
-  .card.collapsed .card-body{display:none}
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th {
+    text-align: left;
+    padding: 10px 12px;
+    background: var(--card2);
+    border-bottom: 1px solid var(--border);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text2);
+    cursor: pointer;
+    user-select: none;
+    position: sticky; top: 0;
+  }
+  th:hover { color: var(--primary); }
+  th .arrow { display: inline-block; margin-left: 4px; opacity: 0.4; font-size: 10px; }
+  th.sorted .arrow { opacity: 1; color: var(--primary); }
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(30,45,74,0.5);
+  }
+  tr:hover td { background: rgba(0,212,255,0.04); }
+  .sym { font-weight: 600; color: var(--primary); font-family: ui-monospace, 'SF Mono', Menlo, monospace; }
+  .pos { color: var(--profit); font-weight: 600; }
+  .neg { color: var(--loss); font-weight: 600; }
+  .neu { color: var(--text2); }
 
-  /* Metric */
-  .metric .value{font-size:24px;font-weight:700;letter-spacing:.3px}
-  .metric .delta{font-size:12px;color:var(--muted);margin-top:4px}
-  .pos{color:var(--green)}
-  .neg{color:var(--red)}
-  .neu{color:var(--muted)}
+  .search {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: 6px;
+    width: 100%;
+    margin-bottom: 12px;
+    font-size: 13px;
+    font-family: inherit;
+  }
+  .search:focus { outline: none; border-color: var(--primary); }
 
-  /* Sparkline */
-  .spark{margin-top:8px;width:100%;height:36px}
+  .empty {
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--text2);
+    font-size: 13px;
+  }
+  .empty .icon { font-size: 28px; margin-bottom: 8px; opacity: 0.5; }
 
-  /* Tables */
-  table{width:100%;border-collapse:collapse;font-size:13px}
-  th{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);text-align:left;padding:8px 8px;border-bottom:1px solid var(--border);cursor:pointer;user-select:none;white-space:nowrap}
-  th:hover{color:var(--cyan)}
-  th .arrow{opacity:.4;margin-left:4px;font-size:10px}
-  th.sorted .arrow{opacity:1;color:var(--cyan)}
-  td{padding:9px 8px;border-bottom:1px solid rgba(30,45,74,0.55);white-space:nowrap}
-  tbody tr:hover{background:rgba(0,212,255,0.04)}
-  .empty{padding:22px;text-align:center;color:var(--muted);border:1px dashed var(--border);border-radius:8px;font-size:13px}
+  .tabs { display: flex; gap: 2px; margin-bottom: 16px; border-bottom: 1px solid var(--border); }
+  .tab {
+    padding: 8px 16px;
+    background: transparent;
+    border: none;
+    color: var(--text2);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
 
-  /* Search */
-  .search{width:100%;background:#0a1020;border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:6px;font-size:12px;margin-bottom:8px;outline:none}
-  .search:focus{border-color:var(--cyan)}
+  .news-item {
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(30,45,74,0.4);
+  }
+  .news-item:last-child { border-bottom: none; }
+  .news-item .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; gap: 12px; }
+  .news-item .sym-badge {
+    display: inline-block;
+    background: rgba(0,212,255,0.1);
+    border: 1px solid rgba(0,212,255,0.3);
+    color: var(--primary);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  }
+  .news-item .body { font-size: 13px; color: var(--text); }
+  .news-item .meta { font-size: 11px; color: var(--text2); margin-top: 4px; }
 
-  /* Badges */
-  .pill{display:inline-block;padding:3px 8px;border-radius:12px;font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase}
-  .pill-buy{background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.3)}
-  .pill-sell{background:rgba(255,23,68,.15);color:var(--red);border:1px solid rgba(255,23,68,.3)}
-  .pill-hold{background:rgba(255,167,38,.15);color:var(--orange);border:1px solid rgba(255,167,38,.3)}
-  .pill-strong{background:rgba(0,230,118,.15);color:var(--green)}
-  .pill-mod{background:rgba(255,167,38,.15);color:var(--orange)}
-  .pill-weak{background:rgba(255,23,68,.15);color:var(--red)}
-  .sym-badge{display:inline-block;padding:3px 9px;border-radius:5px;background:rgba(0,212,255,.12);color:var(--cyan);font-weight:700;font-size:11px;letter-spacing:.4px}
+  .signal-bar {
+    height: 6px;
+    border-radius: 3px;
+    background: var(--card2);
+    overflow: hidden;
+    margin-top: 4px;
+  }
+  .signal-bar .fill { height: 100%; border-radius: 3px; }
+  .signal-bar .fill.strong { width: 90%; background: var(--profit); }
+  .signal-bar .fill.moderate { width: 60%; background: var(--warn); }
+  .signal-bar .fill.weak { width: 30%; background: var(--loss); }
 
-  /* News tabs */
-  .tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:12px;overflow-x:auto}
-  .tab{padding:8px 14px;cursor:pointer;color:var(--muted);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;border-bottom:2px solid transparent;white-space:nowrap}
-  .tab:hover{color:var(--text)}
-  .tab.active{color:var(--cyan);border-bottom-color:var(--cyan)}
-  .tab-panel{display:none}
-  .tab-panel.active{display:block}
-  .news-item{padding:10px 0;border-bottom:1px solid rgba(30,45,74,0.4)}
-  .news-item:last-child{border-bottom:none}
-  .news-headline{font-weight:600;margin-bottom:3px}
-  .news-impact{color:var(--muted);font-size:12px}
+  .candidate {
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(30,45,74,0.4);
+  }
+  .candidate:last-child { border-bottom: none; }
+  .candidate .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .candidate .reason { font-size: 12px; color: var(--text2); line-height: 1.4; }
 
-  /* Signal bars */
-  .signal-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(30,45,74,0.4)}
-  .signal-row:last-child{border-bottom:none}
-  .signal-bar{flex:1;height:8px;background:#0a1020;border-radius:4px;overflow:hidden;cursor:help;position:relative}
-  .signal-bar div{height:100%;border-radius:4px}
-  .signal-strong div{background:linear-gradient(90deg,#00d4ff,#00e676);width:100%}
-  .signal-moderate div{background:linear-gradient(90deg,#ffa726,#ffb74d);width:60%}
-  .signal-weak div{background:linear-gradient(90deg,#ff1744,#ff5252);width:30%}
+  .order-card {
+    display: flex; align-items: center; gap: 16px;
+    padding: 14px;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 10px;
+  }
+  .action-buy { color: var(--profit); font-weight: 700; }
+  .action-sell { color: var(--loss); font-weight: 700; }
 
-  /* Order cards */
-  .order-card{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-  .order-card:last-child{margin-bottom:0}
-  .order-cancel{color:var(--muted);font-size:11px;margin-top:4px}
+  .reasoning {
+    background: var(--card2);
+    border-left: 3px solid var(--primary);
+    padding: 14px 16px;
+    border-radius: 0 6px 6px 0;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text);
+    margin-top: 10px;
+  }
+  .reasoning strong { color: var(--primary); }
+  .key { color: var(--text2); }
+  .val { color: var(--text); font-weight: 600; }
 
-  /* Mini stats */
-  .mini-stats{display:flex;gap:18px;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.8px}
-  .mini-stats span{display:flex;align-items:center;gap:5px}
-  .mini-stats b{color:var(--text);font-size:12px}
+  .kv-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 20px;
+    font-size: 13px;
+  }
+  .kv-grid div { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid rgba(30,45,74,0.4); }
 
-  /* Footer */
-  .footer{color:var(--muted);font-size:11px;text-align:center;padding:16px;margin-top:18px;border-top:1px solid var(--border)}
+  details summary { cursor: pointer; padding: 12px 18px; user-select: none; }
+  details summary:hover { color: var(--primary); }
+  details[open] summary { border-bottom: 1px solid var(--border); }
 
-  .reason-box{background:rgba(255,167,38,0.06);border-left:3px solid var(--orange);padding:11px 14px;border-radius:0 6px 6px 0;font-size:12.5px;line-height:1.55}
-  .reason-box.green{background:rgba(0,230,118,0.06);border-left-color:var(--green)}
-  .reason-box.red{background:rgba(255,23,68,0.06);border-left-color:var(--red)}
+  @media (max-width: 1100px) {
+    .row.r1 { grid-template-columns: repeat(2, 1fr); }
+    .row.split { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .row.r1 { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
+
+<div class="topbar">
+  <div class="logo">⚡ TRADING CEO AGENT <small>v5 · Cycle 5</small></div>
+  <div class="badge" id="statusBadge">
+    <span class="dot"></span>
+    <span id="statusText">LIVE TRADING — NYSE OPEN</span>
+  </div>
+  <div class="topbar-right">
+    <div>Last updated: <span id="lastUpdate">2026-05-11 20:55 UTC</span></div>
+    <div>Refreshing in <span class="countdown" id="countdown">60s</span></div>
+  </div>
+</div>
+
 <div class="container">
 
-  <!-- TOP BAR -->
-  <div class="topbar">
-    <div class="brand">
-      <div class="brand-logo">⚡</div>
-      <div>
-        <div class="brand-name">Trading CEO Agent</div>
-        <div class="brand-sub">Questrade · Account 53826201</div>
+  <!-- Row 1: Key metrics -->
+  <div class="row r1">
+    <div class="card">
+      <div class="card-h"><h3>Total Equity</h3><button class="toggle" data-collapse>▼</button></div>
+      <div class="card-body">
+        <div class="metric"><div class="value">$173.12</div><div class="sub">USD $73.12 + CAD $100.00</div></div>
       </div>
     </div>
-    <div class="status-pill"><span class="pulse"></span> LIVE TRADING — NYSE OPEN</div>
-    <div class="time-block">
-      <div class="label">Last Updated</div>
-      <div class="val">2026-05-11 15:30 UTC</div>
-      <div class="label" style="margin-top:6px">Refresh in</div>
-      <div class="val countdown" id="countdown">60s</div>
-    </div>
-  </div>
-
-  <!-- ROW 1: METRICS -->
-  <div class="row row-4">
-    <div class="card metric" data-card="equity">
-      <div class="card-head"><span class="card-title">Total Equity</span><button class="card-action" onclick="toggleCard('equity')">▼</button></div>
+    <div class="card">
+      <div class="card-h"><h3>Buying Power</h3><button class="toggle" data-collapse>▼</button></div>
       <div class="card-body">
-        <div class="value">$173.12 <span style="font-size:12px;color:var(--muted);font-weight:400">USD eq.</span></div>
-        <div class="delta neu">USD $73.12 + CAD $100.00</div>
+        <div class="metric"><div class="value">$71.51</div><div class="sub">USD · 5% max trade: $3.58</div></div>
       </div>
     </div>
-    <div class="card metric" data-card="bp">
-      <div class="card-head"><span class="card-title">Buying Power</span><button class="card-action" onclick="toggleCard('bp')">▼</button></div>
+    <div class="card">
+      <div class="card-h"><h3>Cash</h3><button class="toggle" data-collapse>▼</button></div>
       <div class="card-body">
-        <div class="value">$71.51 <span style="font-size:12px;color:var(--muted);font-weight:400">USD</span></div>
-        <div class="delta neg">⚠ Below $200 risk threshold</div>
+        <div class="metric"><div class="value">$73.12</div><div class="sub">USD · CAD $100.00 also avail</div></div>
       </div>
     </div>
-    <div class="card metric" data-card="cash">
-      <div class="card-head"><span class="card-title">Cash</span><button class="card-action" onclick="toggleCard('cash')">▼</button></div>
-      <div class="card-body">
-        <div class="value">$73.12</div>
-        <div class="delta neu">+ CAD $100.00 unused</div>
+    <div class="card">
+      <div class="card-h">
+        <h3>P&amp;L Today</h3>
+        <button class="toggle" data-collapse>▼</button>
       </div>
-    </div>
-    <div class="card metric" data-card="pnl">
-      <div class="card-head"><span class="card-title">P&L Today</span><button class="card-action" onclick="toggleCard('pnl')">▼</button></div>
       <div class="card-body">
-        <div class="value neu">$0.00</div>
-        <div class="delta neu">No open positions</div>
-        <svg class="spark" viewBox="0 0 200 36" preserveAspectRatio="none">
-          <polyline points="0,18 22,18 44,18 66,18 88,18 110,18 132,18 154,18 176,18 200,18"
-                    fill="none" stroke="#3b82f6" stroke-width="1.5"/>
-          <circle cx="200" cy="18" r="2.5" fill="#00d4ff"/>
+        <div class="metric"><div class="value neu" style="color:var(--text2);">$0.00</div><div class="sub">0 positions · 0 trades</div></div>
+        <svg width="100%" height="40" viewBox="0 0 200 40" style="margin-top:10px;">
+          <polyline points="0,20 20,20 40,20 60,20 80,20 100,20 120,20 140,20 160,20 180,20 200,20"
+                    fill="none" stroke="#8892a4" stroke-width="1.5" stroke-dasharray="3,3" />
+          <circle cx="200" cy="20" r="3" fill="#00d4ff"/>
         </svg>
       </div>
     </div>
   </div>
 
-  <!-- ROW 2: POSITIONS + MARKET STATUS -->
-  <div class="row row-2-1">
-    <div class="card" data-card="positions">
-      <div class="card-head">
-        <span class="card-title">Positions</span>
-        <div style="display:flex;align-items:center;gap:14px">
-          <svg width="36" height="36" viewBox="0 0 36 36">
-            <circle cx="18" cy="18" r="14" fill="none" stroke="#1e2d4a" stroke-width="6"/>
+  <!-- Row 2: Positions + Market Status -->
+  <div class="row split">
+    <div class="card">
+      <div class="card-h">
+        <h3>Positions</h3>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <svg width="32" height="32" viewBox="0 0 32 32">
+            <circle cx="16" cy="16" r="14" fill="none" stroke="#1e2d4a" stroke-width="2"/>
+            <text x="16" y="20" text-anchor="middle" font-size="10" fill="#8892a4">0</text>
           </svg>
-          <span class="mini-stats"><span>Total: <b>0</b></span></span>
-          <button class="card-action" onclick="toggleCard('positions')">▼</button>
+          <button class="toggle" data-collapse>▼</button>
         </div>
       </div>
       <div class="card-body">
-        <input class="search" placeholder="🔍 Filter by symbol…" oninput="filterTable('pos-table', this.value)">
-        <table id="pos-table">
+        <input class="search" placeholder="🔎 Search positions by symbol…" data-filter="positions">
+        <table data-sortable id="positions">
           <thead><tr>
-            <th onclick="sortTable('pos-table',0)">Symbol <span class="arrow">↕</span></th>
-            <th onclick="sortTable('pos-table',1,'num')">Qty <span class="arrow">↕</span></th>
-            <th onclick="sortTable('pos-table',2,'num')">Avg Cost <span class="arrow">↕</span></th>
-            <th onclick="sortTable('pos-table',3,'num')">Mkt Value <span class="arrow">↕</span></th>
-            <th onclick="sortTable('pos-table',4,'num')">P&L <span class="arrow">↕</span></th>
+            <th>Symbol <span class="arrow">↕</span></th>
+            <th>Qty <span class="arrow">↕</span></th>
+            <th>Avg <span class="arrow">↕</span></th>
+            <th>Last <span class="arrow">↕</span></th>
+            <th>Mkt Val <span class="arrow">↕</span></th>
+            <th>P&amp;L <span class="arrow">↕</span></th>
           </tr></thead>
           <tbody></tbody>
         </table>
-        <div class="empty">No positions yet — agent is on HOLD until account is recapitalized</div>
+        <div class="empty"><div class="icon">📊</div>No positions yet — HOLD policy active</div>
       </div>
     </div>
 
-    <div class="card" data-card="market">
-      <div class="card-head"><span class="card-title">Market & Watchlist</span><button class="card-action" onclick="toggleCard('market')">▼</button></div>
+    <div class="card">
+      <div class="card-h"><h3>Market Status & Watchlist</h3><button class="toggle" data-collapse>▼</button></div>
       <div class="card-body">
-        <div style="margin-bottom:14px">
-          <div class="mini-stats" style="margin-bottom:10px">
-            <span>S&P 500 <b class="pos">7,424 +0.34%</b></span>
-          </div>
-          <div class="mini-stats" style="margin-bottom:10px">
-            <span>Nasdaq <b class="pos">26,346 +0.38%</b></span>
-          </div>
-          <div class="mini-stats" style="margin-bottom:10px">
-            <span>WTI Oil <b class="pos">$98.07 +2.78%</b></span>
-          </div>
-          <div class="mini-stats" style="margin-bottom:10px">
-            <span>BTC <b class="neg">$80,972 -1.4%</b></span>
-          </div>
-          <div class="mini-stats">
-            <span>VIX <b class="neu">17.19</b></span>
-          </div>
+        <div class="kv-grid" style="margin-bottom:14px;">
+          <div><span class="key">S&amp;P 500</span><span class="val pos">7,424 +0.34%</span></div>
+          <div><span class="key">Nasdaq</span><span class="val pos">26,346 +0.38%</span></div>
+          <div><span class="key">Dow</span><span class="val neu">49,605 -0.01%</span></div>
+          <div><span class="key">Russell 2K</span><span class="val pos">+0.78%</span></div>
+          <div><span class="key">WTI Oil</span><span class="val neg">$98.07</span></div>
+          <div><span class="key">BTC</span><span class="val neu">~$80,817</span></div>
+          <div><span class="key">VIX regime</span><span class="val">Elevated</span></div>
+          <div><span class="key">Breadth</span><span class="val neg">41.9% adv</span></div>
         </div>
-        <div style="font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:8px">Active Watchlist</div>
-        <div style="font-size:12px;line-height:1.7">
-          <div><span class="sym-badge">QCOM</span> <span class="pos">+8.17%</span> $219 — analyst upgrade</div>
-          <div><span class="sym-badge">MU</span> <span class="pos">+15.49%</span> $747 — memory supercycle</div>
-          <div><span class="sym-badge">INTC</span> <span class="pos">+13.96%</span> $125 — Nvidia tie-up</div>
-          <div><span class="sym-badge">MRNA</span> <span class="pos">+11.97%</span> $54 — hantavirus</div>
-          <div><span class="sym-badge">LITE</span> <span class="pos">+1.26%</span> $904 — Nasdaq 100 add 5/18</div>
-          <div><span class="sym-badge">MOS</span> <span class="neg">-3.14%</span> $22 — bounce candidate</div>
+        <h3 style="font-size:11px;text-transform:uppercase;color:var(--text2);margin-bottom:8px;letter-spacing:0.5px;">Watchlist</h3>
+        <div style="font-size:12px;line-height:1.7;">
+          <div><span class="sym">QCOM</span> $219 <span class="pos">+7.3%</span> · analyst upgrade</div>
+          <div><span class="sym">MU</span> $747 <span class="pos">+5.6%</span> · memory supercycle</div>
+          <div><span class="sym">INTC</span> $125 <span class="pos">+14%</span> · NVDA $5B tie-up</div>
+          <div><span class="sym">MRNA</span> $54 <span class="pos">+12%</span> · hantavirus pop</div>
+          <div><span class="sym">LITE</span> $904 <span class="pos">+1.3%</span> · NDX add 5/18</div>
+          <div><span class="sym">MNDY</span> <span class="pos">+26%</span> · post-earnings momentum</div>
+          <div><span class="sym">CRCL</span> · Circle Q1 beat, ARC raise</div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ROW 3: NEWS TABS -->
+  <!-- Row 3: News tabs -->
   <div class="row">
-    <div class="card" data-card="news">
-      <div class="card-head"><span class="card-title">Live News Feed</span><button class="card-action" onclick="toggleCard('news')">▼</button></div>
+    <div class="card">
+      <div class="card-h"><h3>📰 Live News Feed</h3><button class="toggle" data-collapse>▼</button></div>
       <div class="card-body">
         <div class="tabs">
-          <div class="tab active" onclick="showTab(event,'tab-movers')">Top Movers</div>
-          <div class="tab" onclick="showTab(event,'tab-breaking')">Breaking News</div>
-          <div class="tab" onclick="showTab(event,'tab-earnings')">Earnings</div>
-          <div class="tab" onclick="showTab(event,'tab-macro')">Macro</div>
-          <div class="tab" onclick="showTab(event,'tab-crypto')">Crypto / Global</div>
+          <button class="tab active" data-tab="movers">🚀 Top Movers</button>
+          <button class="tab" data-tab="breaking">⚡ Breaking</button>
+          <button class="tab" data-tab="earnings">💼 Earnings</button>
+          <button class="tab" data-tab="macro">🌍 Macro</button>
+          <button class="tab" data-tab="crypto">₿ Crypto</button>
         </div>
 
-        <div id="tab-movers" class="tab-panel active">
-          <div class="news-item"><div class="news-headline"><span class="sym-badge">MU</span> +15.49% — Micron memory rally</div><div class="news-impact">Analysts now talking AI memory sector supercycle. Mid-session continuation +5.6%.</div></div>
-          <div class="news-item"><div class="news-headline"><span class="sym-badge">INTC</span> +13.96% — Intel</div><div class="news-impact">Nvidia's $5B Intel bet starting to pay off; AI chip tailwind extends.</div></div>
-          <div class="news-item"><div class="news-headline"><span class="sym-badge">MRNA</span> +11.97% — Moderna</div><div class="news-impact">Hantavirus early research bid; stock +15% over 5 days. News-pop fade risk in 2-3 days.</div></div>
-          <div class="news-item"><div class="news-headline"><span class="sym-badge">QCOM</span> +8.17% — Qualcomm</div><div class="news-impact">Analyst upgrade — strongest single-name momentum mid-session (+7.3%).</div></div>
-          <div class="news-item"><div class="news-headline"><span class="sym-badge">APP</span> -6.08% / <span class="sym-badge">MOS</span> -3.14%</div><div class="news-impact">Profit-taking in software/ag-chem laggards.</div></div>
+        <div class="tab-panel active" data-panel="movers">
+          <div class="news-item"><div class="head"><span class="sym-badge">INOD</span><span class="pos">+51%</span></div><div class="body">Crushed Q1 estimates, raised 2026 outlook to 40%+ growth; $51M Big Tech partnership announced.</div></div>
+          <div class="news-item"><div class="head"><span class="sym-badge">MU</span><span class="pos">+15.49% pre / +5.6% intraday</span></div><div class="body">$746.81 — memory supercycle continuation on AI demand. Apple's Tim Cook warned about hardware shortages and high memory prices.</div></div>
+          <div class="news-item"><div class="head"><span class="sym-badge">INTC</span><span class="pos">+13.96%</span></div><div class="body">$124.92 — Nvidia's $5B Intel bet starts to pay off; AI tailwind extending chip rally.</div></div>
+          <div class="news-item"><div class="head"><span class="sym-badge">MRNA</span><span class="pos">+11.97%</span></div><div class="body">$54.35 — hantavirus vaccine early development; +15% over past 5 days but typically fades.</div></div>
+          <div class="news-item"><div class="head"><span class="sym-badge">QCOM</span><span class="pos">+8.17% pre / +7.3% intraday</span></div><div class="body">$219.09 — strongest momentum among chips on analyst upgrade.</div></div>
+          <div class="news-item"><div class="head"><span class="sym-badge">CRCL</span><span class="pos">soared</span></div><div class="body">Q1: revenue $694M (+20%), adj EBITDA $151M (+24%), USDC $77B in circulation (+28%). Raised $222M for Arc token at $3B valuation (BlackRock, Apollo, ARK, Bullish).</div></div>
+          <div class="news-item"><div class="head"><span class="sym-badge">FWRD</span><span class="neg">-44%</span></div><div class="body">Weak Q1 update; liquidity concerns and customer transition.</div></div>
+          <div class="news-item"><div class="head"><span class="sym-badge">PLTR</span><span class="neg">-2.57%</span></div><div class="body">$134.25 — valuation/profit-taking pullback despite strong Q1 reported May 5.</div></div>
         </div>
 
-        <div id="tab-breaking" class="tab-panel">
-          <div class="news-item"><div class="news-headline">Trump rejects Iran's response to peace proposal as "TOTALLY UNACCEPTABLE"</div><div class="news-impact">Oil +3%, WTI near $98-99, Brent toward $103. Hormuz remains effectively closed. Iran ceasefire is "on life support".</div></div>
-          <div class="news-item"><div class="news-headline">Indexes at/near record highs anyway — chipmakers carrying market</div><div class="news-impact">Mid-session S&P +0.34% to 7,424; Nasdaq +0.38% to 26,346. Just 41.9% of issues advancing — narrow leadership.</div></div>
-          <div class="news-item"><div class="news-headline">Disney under FCC license probe (FCC fast-tracked review)</div><div class="news-impact">DIS +2.97% despite probe — short-term regulatory overhang.</div></div>
-          <div class="news-item"><div class="news-headline">JPMorgan: "AI supercycle may just be getting started" (2026 midyear outlook)</div><div class="news-impact">Bullish on semis, networking/optical, power generation.</div></div>
-          <div class="news-item"><div class="news-headline">Cirrus Logic (CRUS) beat Q4 FY26 and guided above; new ATH</div><div class="news-impact">Apple is 90%+ of sales — concentration risk noted, but momentum strong.</div></div>
+        <div class="tab-panel" data-panel="breaking">
+          <div class="news-item"><div class="body">🇺🇸🇮🇷 <strong>Trump rejects Iran peace proposal as "TOTALLY UNACCEPTABLE"</strong> — Strait of Hormuz remains effectively closed; ceasefire "on life support."</div><div class="meta">Oil: WTI $98.07 (+2.78%), Brent $103. AP/Bloomberg</div></div>
+          <div class="news-item"><div class="body">📈 <strong>Yardeni hikes S&P 500 year-end target to 8,250 from 7,700</strong> — "Earnings estimates have been phenomenal. I've never seen anything like it."</div><div class="meta">CNBC Squawk Box</div></div>
+          <div class="news-item"><div class="body">🤖 <strong>JPMorgan Private Bank: AI supercycle "may just be getting started"</strong> — Favors semis, networking/optical equipment, power generation.</div><div class="meta">2026 mid-year outlook</div></div>
+          <div class="news-item"><div class="body">📉 <strong>Goldman cuts recession odds 30% → 25%</strong> — Hatzius: market "bending, not breaking" through Iran war.</div><div class="meta">Goldman Sachs research</div></div>
+          <div class="news-item"><div class="body">🎬 <strong>Disney (DIS +2.97%) under FCC license review</strong> — Brendan Carr fast-tracks 8 broadcast licenses originally set for 2028.</div></div>
+          <div class="news-item"><div class="body">⚠️ <strong>NARROW BREADTH WARNING</strong> — 41.9% advancing vs >55% declining despite SPX/COMP records. Chip-name concentration carrying tape — historical yellow flag.</div></div>
         </div>
 
-        <div id="tab-earnings" class="tab-panel">
-          <div class="news-item"><div class="news-headline">Today (5/11)</div><div class="news-impact">AM: CEG, CRCL, MNDY, B, FOX · ~220 reports total. PBR, Barrick Mining, Simon Property, Circle Internet Group.</div></div>
-          <div class="news-item"><div class="news-headline">Tue (5/12)</div><div class="news-impact"><b>CSCO</b> (key) — networking AI demand read. CPI release morning of.</div></div>
-          <div class="news-item"><div class="news-headline">Wed (5/13)</div><div class="news-impact">BABA, TAK.</div></div>
-          <div class="news-item"><div class="news-headline">Thu (5/14)</div><div class="news-impact"><b>AMAT</b> (key — AI semi cap-ex tell), NGG.</div></div>
-          <div class="news-item"><div class="news-headline">Tue 5/20</div><div class="news-impact"><b>NVDA</b> earnings — month's largest catalyst.</div></div>
+        <div class="tab-panel" data-panel="earnings">
+          <div class="news-item"><div class="head"><span class="sym-badge">HIMS</span><span class="neu">Tonight 5pm ET</span></div><div class="body">Rebounded +45% past month after -45% YoY. Polymarket prices just 15.5% probability of beat vs 35% short interest — asymmetric squeeze potential if EPS clears $0.03 bar. CFO insider selling in April.</div></div>
+          <div class="news-item"><div class="head"><span class="sym-badge">CRCL</span><span class="pos">Reported 5/11 AM</span></div><div class="body">Beat EBITDA, missed revenue. USDC tx volume $21.5T (+263%). Net income $55M (-15% YoY).</div></div>
+          <div class="news-item"><div class="head"><span class="sym-badge">CSCO</span><span class="neu">This week</span></div><div class="body">Surged 4.8% Friday on Zacks Rank #2 Buy. Major highlight.</div></div>
+          <div class="news-item"><div class="head"><span class="sym-badge">AMAT</span><span class="neu">This week</span></div><div class="body">Applied Materials — semi cap-ex bellwether.</div></div>
+          <div class="news-item"><div class="head"><span class="sym-badge">NVDA</span><span class="warn" style="color:var(--warn);">5/20 Tue — HIGHEST IMPACT EVENT OF MONTH</span></div><div class="body">Q1 FY26 revenue $68.1B (+73% YoY); $1T+ Blackwell/Rubin demand pipeline per Jensen Huang. CY26 EPS estimates "phenomenal."</div></div>
+          <div class="news-item"><div class="head"><span class="sym-badge">S&P 500</span></div><div class="body">89% of S&P 500 reported Q1; 84% beat EPS (above 5-yr avg 78%). Blended earnings growth 27.7% — highest since Q4 2021. Forward P/E 21.0.</div></div>
         </div>
 
-        <div id="tab-macro" class="tab-panel">
-          <div class="news-item"><div class="news-headline">5/12 Tue 08:30 ET — April CPI</div><div class="news-impact">Consensus: headline +0.6-0.7% MoM, 3.7-3.8% YoY · core +0.3% MoM, 2.7% YoY. BofA: no Fed cuts in 2026.</div></div>
-          <div class="news-item"><div class="news-headline">5/13 Wed — April PPI &amp; Retail Sales</div><div class="news-impact">Producer inflation and consumer demand read.</div></div>
-          <div class="news-item"><div class="news-headline">5/14 Thu — CLARITY Act Senate markup (crypto)</div><div class="news-impact">Regulatory catalyst for crypto names.</div></div>
-          <div class="news-item"><div class="news-headline">5/15 — Powell's chairmanship ends</div><div class="news-impact">Warsh expected to chair June FOMC — tightening bias risk priced in.</div></div>
-          <div class="news-item"><div class="news-headline">5/20 — NVDA earnings (biggest event of month)</div><div class="news-impact">Will set the chip-supercycle tone.</div></div>
+        <div class="tab-panel" data-panel="macro">
+          <div class="news-item"><div class="head"><span class="sym-badge" style="background:rgba(255,167,38,0.1);border-color:rgba(255,167,38,0.3);color:var(--warn);">5/12 Tue 8:30 ET</span></div><div class="body"><strong>April CPI</strong> — consensus 3.8% headline / 2.7% core. HIGH IMPACT. Overnight gap risk for any new positions today.</div></div>
+          <div class="news-item"><div class="head"><span class="sym-badge" style="background:rgba(255,167,38,0.1);border-color:rgba(255,167,38,0.3);color:var(--warn);">5/13 Wed</span></div><div class="body">April PPI + Retail Sales.</div></div>
+          <div class="news-item"><div class="head"><span class="sym-badge">5/14 Thu</span></div><div class="body">CLARITY Act Senate markup (crypto legislation).</div></div>
+          <div class="news-item"><div class="head"><span class="sym-badge" style="background:rgba(255,167,38,0.1);border-color:rgba(255,167,38,0.3);color:var(--warn);">5/15 Fri</span></div><div class="body"><strong>Powell chairmanship ends</strong> → Senate vote on Kevin Warsh as Fed Chair successor. Warsh viewed as favoring lower rates — dovish for risk assets.</div></div>
+          <div class="news-item"><div class="head"><span class="sym-badge">FOMC</span></div><div class="body">Fed held at 3.5–3.75% for 3rd consecutive meeting in April. 8-4 vote — first time since Oct 1992 that 4 officials dissented.</div></div>
+          <div class="news-item"><div class="head"><span class="sym-badge">Iran</span></div><div class="body">Strait of Hormuz closure since late Feb threatens energy supply through 2027 per Saudi Aramco. Bloomberg analysts warn rationing possible within weeks.</div></div>
         </div>
 
-        <div id="tab-crypto" class="tab-panel">
-          <div class="news-item"><div class="news-headline">BTC $80,972 (-1.4%)</div><div class="news-impact">Opened at $82,164 — strongest open since Jan 31. Drifting on Iran headlines.</div></div>
-          <div class="news-item"><div class="news-headline">ETH $2,331</div><div class="news-impact">Highest open since 4/27.</div></div>
-          <div class="news-item"><div class="news-headline">Oil — WTI $98.07 (+2.78%), Brent ~$103</div><div class="news-impact">Hormuz closure persists — inflation tailwind for tomorrow's CPI.</div></div>
-          <div class="news-item"><div class="news-headline">Global — Kospi +4.70% to record</div><div class="news-impact">SK Hynix +10.74% tracking US chip rally — semi tape strong globally.</div></div>
+        <div class="tab-panel" data-panel="crypto">
+          <div class="news-item"><div class="head"><span class="sym-badge">BTC</span><span class="neu">$80,817 — $82,000 range</span></div><div class="body">Whipsawed CME open as Iran tensions pressured crypto. Briefly topped $82,400 before slipping below $81,000. Bitcoin funds saw $700M of institutional inflows last week.</div></div>
+          <div class="news-item"><div class="head"><span class="sym-badge">ETH</span><span class="neu">$2,333</span></div><div class="body">Opened $2,369 — highest opening since April 27.</div></div>
+          <div class="news-item"><div class="head"><span class="sym-badge">SOL</span><span class="pos">$97.43 +2.63%</span></div></div>
+          <div class="news-item"><div class="head"><span class="sym-badge">CRCL</span></div><div class="body">Circle Q1 — USDC circulation $77B (+28%), onchain volume $21.5T (+263%). Launched CPN Managed Payments.</div></div>
+          <div class="news-item"><div class="head"><span class="sym-badge">Global</span></div><div class="body">🇰🇷 Kospi +4.70% record open led by SK Hynix +10.74% on US chip rally. 🇯🇵 Nikkei flat. 🇭🇰 Hang Seng -0.48%. 🇨🇳 CSI 300 +0.58%.</div></div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ROW 4: TRADES + ANALYSIS -->
-  <div class="row row-2-1">
-    <div class="card" data-card="trades">
-      <div class="card-head">
-        <span class="card-title">Recent Trades</span>
-        <button class="card-action" onclick="toggleCard('trades')">▼</button>
-      </div>
+  <!-- Row 4: Recent Trades + Agent Analysis -->
+  <div class="row split">
+    <div class="card">
+      <div class="card-h"><h3>Recent Trades</h3><button class="toggle" data-collapse>▼</button></div>
       <div class="card-body">
-        <input class="search" placeholder="🔍 Filter by symbol or date…" oninput="filterTable('trades-table', this.value)">
-        <table id="trades-table">
+        <input class="search" placeholder="🔎 Search trades by symbol or date…" data-filter="trades">
+        <table data-sortable id="trades">
           <thead><tr>
-            <th onclick="sortTable('trades-table',0)">Date <span class="arrow">↕</span></th>
-            <th onclick="sortTable('trades-table',1)">Symbol <span class="arrow">↕</span></th>
-            <th onclick="sortTable('trades-table',2)">Side <span class="arrow">↕</span></th>
-            <th onclick="sortTable('trades-table',3,'num')">Qty <span class="arrow">↕</span></th>
-            <th onclick="sortTable('trades-table',4,'num')">Price <span class="arrow">↕</span></th>
-            <th onclick="sortTable('trades-table',5,'num')">P&L <span class="arrow">↕</span></th>
+            <th>Date <span class="arrow">↕</span></th>
+            <th>Symbol <span class="arrow">↕</span></th>
+            <th>Action <span class="arrow">↕</span></th>
+            <th>Qty <span class="arrow">↕</span></th>
+            <th>Price <span class="arrow">↕</span></th>
+            <th>P&amp;L <span class="arrow">↕</span></th>
           </tr></thead>
           <tbody></tbody>
         </table>
-        <div class="empty">No trades today — agent on HOLD per risk policy</div>
+        <div class="empty"><div class="icon">📋</div>No trades today — agent on HOLD policy</div>
       </div>
     </div>
 
-    <div class="card" data-card="analysis">
-      <div class="card-head"><span class="card-title">Agent Analysis &amp; Signals</span><button class="card-action" onclick="toggleCard('analysis')">▼</button></div>
+    <div class="card">
+      <div class="card-h"><h3>🤖 Agent Analysis & Signals</h3><button class="toggle" data-collapse>▼</button></div>
       <div class="card-body">
-        <div style="margin-bottom:14px">
-          <span class="pill pill-hold">DECISION: HOLD</span>
+        <div class="candidate" title="QCOM — strongest analyst upgrade momentum among chips today. Above buying power; untradeable.">
+          <div class="top"><span class="sym">QCOM</span><span class="pos">$219 +7.3%</span></div>
+          <div class="reason">Analyst upgrade, strongest chip-momentum today.</div>
+          <div class="signal-bar"><div class="fill strong"></div></div>
         </div>
-        <div class="reason-box">
-          <b>Why HOLD (4th confirmation):</b> USD buying power $71.51 → 5% per-trade cap = $3.58. No equity priced at $3.58. Cheapest watchlist name (MOS ~$22) would consume 30% of account on a single share — grossly violates concentration. CPI tomorrow 08:30 ET creates asymmetric overnight gap risk for any thin position.
+        <div class="candidate" title="MU — memory/AI supercycle continuation. Far above buying power.">
+          <div class="top"><span class="sym">MU</span><span class="pos">$747 +5.6%</span></div>
+          <div class="reason">Memory/AI supercycle continuation; AAPL warns of memory prices.</div>
+          <div class="signal-bar"><div class="fill strong"></div></div>
         </div>
-        <div style="margin-top:14px;font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:8px">Top 3 Candidates</div>
-        <div class="signal-row" title="Strongest momentum + analyst upgrade + chip supercycle. Out of buying power.">
-          <span class="sym-badge">QCOM</span>
-          <div class="signal-bar signal-strong"><div></div></div>
-          <span class="pill pill-strong">STRONG</span>
+        <div class="candidate" title="CRCL — Circle Q1 EBITDA beat, $222M Arc token raise from BlackRock/Apollo/ARK. Stablecoin tailwind.">
+          <div class="top"><span class="sym">CRCL</span><span class="neu">post-earnings</span></div>
+          <div class="reason">Q1 EBITDA beat; $222M Arc raise from BlackRock/Apollo.</div>
+          <div class="signal-bar"><div class="fill moderate"></div></div>
         </div>
-        <div class="signal-row" title="Memory leader, +15.5% premkt, +5.6% intraday. Way out of buying power.">
-          <span class="sym-badge">MU</span>
-          <div class="signal-bar signal-strong"><div></div></div>
-          <span class="pill pill-strong">STRONG</span>
-        </div>
-        <div class="signal-row" title="Fits buying power at $54.35 for 1 share — but 76% of account, violates 5% concentration rule.">
-          <span class="sym-badge">MRNA</span>
-          <div class="signal-bar signal-moderate"><div></div></div>
-          <span class="pill pill-mod">MODERATE</span>
+
+        <div class="reasoning">
+          <strong>DECISION: HOLD</strong> (Cycle 5 — 5th consecutive)<br><br>
+          • <span class="key">Buying power:</span> <span class="val">$71.51 USD</span> · 5%-rule max trade <span class="val">$3.58</span><br>
+          • All 3 candidates are <strong>untradeable</strong> at current share prices ($219, $747, post-$200 estimate).<br>
+          • <strong>CPI tomorrow 8:30 ET</strong> — overnight gap risk even if BP allowed.<br>
+          • <strong>Narrow breadth flag:</strong> 41.9% advancing while indexes set records.<br>
+          • <strong>State unchanged for 5 cycles</strong> — HOLD policy validated. Awaiting recapitalization event.<br><br>
+          <em>Default policy until BP > $200 USD or sub-$10 high-conviction setup emerges.</em>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ROW 5: OPEN ORDERS -->
+  <!-- Row 5: Open Orders -->
   <div class="row">
-    <div class="card" data-card="orders">
-      <div class="card-head"><span class="card-title">Open Orders</span><button class="card-action" onclick="toggleCard('orders')">▼</button></div>
+    <div class="card">
+      <div class="card-h"><h3>Open Orders</h3><button class="toggle" data-collapse>▼</button></div>
       <div class="card-body">
-        <div class="empty">✓ No open orders</div>
+        <div class="empty"><div class="icon">✅</div>No open orders</div>
       </div>
     </div>
   </div>
 
-  <!-- ROW 6: ACTIVITY -->
+  <!-- Row 6: Activity Feed (collapsible) -->
   <div class="row">
-    <div class="card collapsed" data-card="activity">
-      <div class="card-head"><span class="card-title">Activity Feed (collapsed)</span><button class="card-action" onclick="toggleCard('activity')">▼</button></div>
-      <div class="card-body">
-        <div class="news-item"><div class="news-headline">15:30 UTC — Cycle 4: Auth OK, HOLD (4th confirmation)</div><div class="news-impact">Persistent state: BP $71.51, 0 positions, 0 orders. CPI tomorrow 08:30 ET.</div></div>
-        <div class="news-item"><div class="news-headline">~16:07 UTC — Cycle 3: HOLD (3rd confirmation)</div><div class="news-impact">Masked refresh token → fell back to persisted token. Authenticated OK.</div></div>
-        <div class="news-item"><div class="news-headline">15:59 UTC — Cycle 2: HOLD policy confirmed</div><div class="news-impact">Watchlist (MU/INTC/QCOM/MRNA) unchanged from cycle 1; all still untradeable for our BP.</div></div>
-        <div class="news-item"><div class="news-headline">19:46 UTC — Cycle 1: Initial assessment, HOLD</div><div class="news-impact">Established baseline: account undercapitalized for 5% rule, top names beyond reach.</div></div>
-      </div>
+    <div class="card">
+      <details open>
+        <summary style="display:flex;justify-content:space-between;align-items:center;">
+          <h3 style="font-size:11px;text-transform:uppercase;color:var(--text2);letter-spacing:0.8px;">Activity Feed</h3>
+          <span style="color:var(--text2);font-size:11px;">▼ toggle</span>
+        </summary>
+        <div style="padding:14px 18px;">
+          <div class="news-item"><div class="meta">20:55 UTC · Cycle 5</div><div class="body">HOLD reaffirmed — account state unchanged (USD BP $71.51, 0 positions, 0 orders). 5th consecutive cycle confirms undercapitalization rule.</div></div>
+          <div class="news-item"><div class="meta">20:55 UTC · Cycle 5</div><div class="body">Authenticated Questrade (fallback to persisted token — inbound was masked **). New refresh token persisted.</div></div>
+          <div class="news-item"><div class="meta">20:54 UTC · Cycle 5</div><div class="body">Research compiled: top 3 candidates (QCOM, MU, CRCL) all untradeable. CPI release tomorrow 8:30 ET. Narrow breadth flag.</div></div>
+          <div class="news-item"><div class="meta">15:30 UTC · Cycle 4</div><div class="body">HOLD (4th confirmation). NVDA $5B Intel tie-up news; JPM AI supercycle outlook.</div></div>
+          <div class="news-item"><div class="meta">20:07 UTC · Cycle 3</div><div class="body">HOLD (3rd confirmation). Token fallback pattern established for masked inbound tokens.</div></div>
+          <div class="news-item"><div class="meta">19:59 UTC · Cycle 2</div><div class="body">HOLD (2nd confirmation). MU/INTC/MRNA/QCOM all untradeable.</div></div>
+          <div class="news-item"><div class="meta">19:46 UTC · Cycle 1</div><div class="body">Initial HOLD. Account undercapitalized for 5% rule. Late-session + CPI overnight = pass.</div></div>
+        </div>
+      </details>
     </div>
   </div>
 
-  <div class="footer">
-    Trading CEO Agent · Cycle 4 · NYSE OPEN · Next refresh in <span class="countdown" id="countdown2">60s</span> · Auto-refresh every 60s
-  </div>
 </div>
 
 <script>
-  // Countdown
-  let s = 60;
-  function tick() {
-    s--;
-    if (s < 0) s = 0;
-    const c1 = document.getElementById('countdown');
-    const c2 = document.getElementById('countdown2');
-    if (c1) c1.textContent = s + 's';
-    if (c2) c2.textContent = s + 's';
-  }
-  setInterval(tick, 1000);
+  // Countdown timer
+  let secs = 60;
+  setInterval(() => {
+    secs--;
+    if (secs <= 0) secs = 60;
+    document.getElementById('countdown').textContent = secs + 's';
+  }, 1000);
 
-  // Tabs
-  function showTab(ev, id) {
-    const tabs = ev.currentTarget.parentElement.querySelectorAll('.tab');
-    tabs.forEach(t => t.classList.remove('active'));
-    ev.currentTarget.classList.add('active');
-    const panels = ev.currentTarget.closest('.card-body').querySelectorAll('.tab-panel');
-    panels.forEach(p => p.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-  }
+  // Collapsible cards
+  document.querySelectorAll('[data-collapse]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      const card = e.target.closest('.card');
+      const body = card.querySelector('.card-body');
+      if (body) {
+        body.classList.toggle('collapsed');
+        btn.textContent = body.classList.contains('collapsed') ? '▲' : '▼';
+        const id = card.querySelector('h3')?.textContent;
+        if (id) localStorage.setItem('collapsed:' + id, body.classList.contains('collapsed'));
+      }
+    });
+  });
+  // Restore collapsed state
+  document.querySelectorAll('.card').forEach(card => {
+    const id = card.querySelector('h3')?.textContent;
+    if (id && localStorage.getItem('collapsed:' + id) === 'true') {
+      const body = card.querySelector('.card-body');
+      const btn = card.querySelector('[data-collapse]');
+      if (body) { body.classList.add('collapsed'); if(btn) btn.textContent='▲'; }
+    }
+  });
 
-  // Collapsible cards (persist in localStorage)
-  function toggleCard(key) {
-    const el = document.querySelector('[data-card="' + key + '"]');
-    el.classList.toggle('collapsed');
-    const state = {};
-    document.querySelectorAll('[data-card]').forEach(c => {
-      state[c.dataset.card] = c.classList.contains('collapsed');
+  // Tab switcher
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const target = tab.dataset.tab;
+      const container = tab.closest('.card-body');
+      container.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      container.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      container.querySelector(`[data-panel="${target}"]`).classList.add('active');
     });
-    try { localStorage.setItem('dash-collapsed', JSON.stringify(state)); } catch(e) {}
-  }
-  try {
-    const saved = JSON.parse(localStorage.getItem('dash-collapsed') || '{}');
-    Object.keys(saved).forEach(k => {
-      const el = document.querySelector('[data-card="' + k + '"]');
-      if (!el) return;
-      if (saved[k]) el.classList.add('collapsed'); else el.classList.remove('collapsed');
-    });
-  } catch(e) {}
+  });
 
   // Sortable tables
-  function sortTable(tableId, col, type) {
-    const tbl = document.getElementById(tableId);
-    if (!tbl) return;
-    const tbody = tbl.tBodies[0];
-    const rows = Array.from(tbody.rows);
-    if (!rows.length) return;
-    const ths = tbl.tHead.rows[0].cells;
-    const cur = ths[col].dataset.dir === 'asc' ? 'desc' : 'asc';
-    for (const th of ths) { th.classList.remove('sorted'); th.dataset.dir = ''; }
-    ths[col].classList.add('sorted');
-    ths[col].dataset.dir = cur;
-    rows.sort((a, b) => {
-      let va = a.cells[col].innerText.trim();
-      let vb = b.cells[col].innerText.trim();
-      if (type === 'num') {
-        va = parseFloat(va.replace(/[^0-9.\-]/g, '')) || 0;
-        vb = parseFloat(vb.replace(/[^0-9.\-]/g, '')) || 0;
-      }
-      return cur === 'asc' ? (va > vb ? 1 : -1) : (va < vb ? 1 : -1);
+  document.querySelectorAll('table[data-sortable]').forEach(table => {
+    table.querySelectorAll('th').forEach((th, idx) => {
+      let asc = true;
+      th.addEventListener('click', () => {
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        rows.sort((a, b) => {
+          const av = a.children[idx]?.textContent.trim() || '';
+          const bv = b.children[idx]?.textContent.trim() || '';
+          const an = parseFloat(av.replace(/[^-0-9.]/g, ''));
+          const bn = parseFloat(bv.replace(/[^-0-9.]/g, ''));
+          if (!isNaN(an) && !isNaN(bn)) return asc ? an - bn : bn - an;
+          return asc ? av.localeCompare(bv) : bv.localeCompare(av);
+        });
+        rows.forEach(r => tbody.appendChild(r));
+        table.querySelectorAll('th').forEach(x => x.classList.remove('sorted'));
+        th.classList.add('sorted');
+        asc = !asc;
+      });
     });
-    rows.forEach(r => tbody.appendChild(r));
-  }
+  });
 
-  // Filter
-  function filterTable(tableId, q) {
-    const tbl = document.getElementById(tableId);
-    if (!tbl) return;
-    q = q.toLowerCase();
-    Array.from(tbl.tBodies[0].rows).forEach(r => {
-      r.style.display = r.innerText.toLowerCase().includes(q) ? '' : 'none';
+  // Search filters
+  document.querySelectorAll('[data-filter]').forEach(inp => {
+    inp.addEventListener('input', e => {
+      const q = e.target.value.toLowerCase();
+      const tableId = e.target.dataset.filter;
+      const table = document.getElementById(tableId);
+      if (!table) return;
+      table.querySelectorAll('tbody tr').forEach(tr => {
+        tr.style.display = tr.textContent.toLowerCase().includes(q) ? '' : 'none';
+      });
     });
-  }
+  });
 </script>
+
 </body>
 </html>
