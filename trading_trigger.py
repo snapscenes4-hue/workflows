@@ -5,17 +5,19 @@ import datetime
 import time
 import requests
 import base64
-import json
 
 AGENT_ID = "agent_011Cap12j53tSWAWcgfi8Nbw"
 ENVIRONMENT_ID = "env_018fWQY1wVF6FdfscF3RSxLT"
 ACCOUNT_NUMBER = "53826201"
 MEMORY_STORE_ID = "memstore_01FM5ZuZ8dM8L4AnFHXHuZM6"
+VAULT_ID = "vlt_011CaqdpX6wpdEcQzPYT2SKk"
 GITHUB_REPO = "snapscenes4-hue/workflows"
 
 print(f"Python version: {sys.version}")
 print(f"Agent ID: {AGENT_ID}")
 print(f"Environment ID: {ENVIRONMENT_ID}")
+print(f"Memory Store ID: {MEMORY_STORE_ID}")
+print(f"Vault ID: {VAULT_ID}")
 print(f"Cycle time: {datetime.datetime.utcnow().isoformat()}Z")
 
 try:
@@ -27,7 +29,6 @@ except ImportError as e:
 
 try:
     from nacl.public import SealedBox, PublicKey
-    from nacl.encoding import RawEncoder
 except ImportError as e:
     print(f"ERROR importing PyNaCl: {e}")
     sys.exit(1)
@@ -58,7 +59,7 @@ def update_github_secret(secret_name, secret_value):
         "Accept": "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28"
     }
-    # Get repo public key
+    # Get repo public key for encryption
     key_resp = requests.get(
         f"https://api.github.com/repos/{GITHUB_REPO}/actions/secrets/public-key",
         headers=headers
@@ -69,9 +70,11 @@ def update_github_secret(secret_name, secret_value):
     # Encrypt using PyNaCl SealedBox
     pub_key_bytes = base64.b64decode(pub_key_data["key"])
     sealed_box = SealedBox(PublicKey(pub_key_bytes))
-    encrypted = base64.b64encode(sealed_box.encrypt(secret_value.encode())).decode()
+    encrypted = base64.b64encode(
+        sealed_box.encrypt(secret_value.encode())
+    ).decode()
 
-    # Write secret
+    # Write secret back to GitHub
     put_resp = requests.put(
         f"https://api.github.com/repos/{GITHUB_REPO}/actions/secrets/{secret_name}",
         headers=headers,
@@ -91,6 +94,7 @@ try:
         agent=AGENT_ID,
         environment_id=ENVIRONMENT_ID,
         title=f"Trading Cycle {datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M')}Z",
+        vault_ids=[VAULT_ID],
         resources=[
             {
                 "type": "memory_store",
@@ -145,7 +149,7 @@ try:
                         full_output += text
                         print(f"[AGENT] {text[:300]}")
 
-                        # Capture new Questrade refresh token from Step 10
+                        # Capture new Questrade refresh token from Step 10 output
                         match = re.search(r'NEW_REFRESH_TOKEN:\s*(\S+)', text)
                         if match and match.group(1) not in ('none', 'null', ''):
                             new_token = match.group(1)
@@ -153,6 +157,9 @@ try:
 
             elif 'agent.tool_use' in str(event_type):
                 print(f"[TOOL] {getattr(event, 'name', 'unknown')}")
+
+            elif 'agent.mcp_tool_use' in str(event_type):
+                print(f"[MCP TOOL] {getattr(event, 'name', 'unknown')}")
 
             elif 'session.status_idle' in str(event_type):
                 stop = getattr(event, 'stop_reason', {})
@@ -170,9 +177,9 @@ try:
         update_github_secret("QUESTRADE_REFRESH_TOKEN", new_token)
     else:
         print("⚠️  No new token found in agent output — next cycle reuses current token")
-        print("    (Check agent output above for CYCLE_COMPLETE block)")
+        print("    Check agent output above for CYCLE_COMPLETE block")
 
-    print(f"✅ Done — {datetime.datetime.utcnow().isoformat()}Z")
+    print(f"✅ All done — {datetime.datetime.utcnow().isoformat()}Z")
 
 except Exception as e:
     print(f"FATAL ERROR: {type(e).__name__}: {e}")
