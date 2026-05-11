@@ -1,116 +1,32 @@
-import anthropic
-import os
-import re
-import time
-import requests
-import base64
-import json
-from nacl.public import SealedBox
-from nacl.encoding import Base64Encoder
+name: Trading Bot - NYSE Open Trigger
 
-AGENT_ID = os.environ["AGENT_ID"]
-ENVIRONMENT_ID = os.environ["ENVIRONMENT_ID"]
-ANTHROPIC_API_KEY = os.environ["ANTHROPIC_API_KEY"]
-QUESTRADE_REFRESH_TOKEN = os.environ["QUESTRADE_REFRESH_TOKEN"]
-GH_PUSH_TOKEN = os.environ["GH_PUSH_TOKEN"]
-GITHUB_REPO = "snapscenes4-hue/workflows"
+on:
+  schedule:
+    - cron: '*/5 13-20 * * 1-5'   # Every 5 min, Mon–Fri, 13:00–20:00 UTC (covers 9:30–4:00 ET)
+  workflow_dispatch:
 
-client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
-def update_github_secret(secret_name, secret_value):
-    """Write a new value to a GitHub Actions secret."""
-    headers = {
-        "Authorization": f"Bearer {GH_PUSH_TOKEN}",
-        "Accept": "application/vnd.github+json",
-        "X-GitHub-Api-Version": "2022-11-28"
-    }
-    # Get repo public key for encryption
-    key_resp = requests.get(
-        f"https://api.github.com/repos/{GITHUB_REPO}/actions/secrets/public-key",
-        headers=headers
-    )
-    key_resp.raise_for_status()
-    pub_key_data = key_resp.json()
+jobs:
+  trigger-trading-session:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-    # Encrypt the secret value
-    pub_key = base64.b64decode(pub_key_data["key"])
-    sealed = SealedBox(pub_key.__class__.from_public_bytes(pub_key) 
-                       if hasattr(pub_key.__class__, 'from_public_bytes') 
-                       else __import__('nacl.public', fromlist=['PublicKey']).PublicKey(pub_key))
-    encrypted = base64.b64encode(
-        SealedBox(__import__('nacl.public', fromlist=['PublicKey']).PublicKey(pub_key))
-        .encrypt(secret_value.encode())
-    ).decode()
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
-    # Update the secret
-    put_resp = requests.put(
-        f"https://api.github.com/repos/{GITHUB_REPO}/actions/secrets/{secret_name}",
-        headers=headers,
-        json={"encrypted_value": encrypted, "key_id": pub_key_data["key_id"]}
-    )
-    put_resp.raise_for_status()
-    print(f"✅ Secret {secret_name} updated")
+      - name: Install dependencies
+        run: pip install "anthropic>=0.92.0" PyNaCl
 
-# 1. Start a new session
-print("Starting trading session...")
-session = client.beta.sessions.create(
-    agent=AGENT_ID,
-    environment_id=ENVIRONMENT_ID,
-    title=f"trading-cycle-{int(time.time())}",
-)
-print(f"Session ID: {session.id}")
-
-# 2. Send tokens as the trigger message
-client.beta.sessions.events.send(
-    session_id=session.id,
-    events=[{
-        "type": "user.message",
-        "content": [{
-            "type": "text",
-            "text": (
-                f"refresh_token: {QUESTRADE_REFRESH_TOKEN}\n"
-                f"github_token: {GH_PUSH_TOKEN}"
-            )
-        }]
-    }]
-)
-
-# 3. Stream events until session goes idle
-new_token = None
-full_agent_output = ""
-
-print("Streaming events...")
-with client.beta.sessions.events.stream(session_id=session.id) as stream:
-    for event in stream:
-        event_type = getattr(event, 'type', str(event))
-
-        if event_type == "agent.message":
-            text = ""
-            for block in getattr(event, 'content', []):
-                if hasattr(block, 'text'):
-                    text += block.text
-            if text:
-                full_agent_output += text
-                print(f"AGENT: {text[:300]}")
-
-                # Capture new refresh token from Step 10 output
-                match = re.search(r'NEW_REFRESH_TOKEN:\s*(\S+)', text)
-                if match and match.group(1) != "none":
-                    new_token = match.group(1)
-                    print(f"✅ New refresh token captured")
-
-        elif event_type == "session.error":
-            print(f"❌ Session error: {event}")
-
-        elif event_type == "session.status_idle":
-            print("Session idle — cycle complete")
-            break
-
-# 4. Rotate token for next cycle
-if new_token:
-    print("Updating QUESTRADE_REFRESH_TOKEN secret...")
-    update_github_secret("QUESTRADE_REFRESH_TOKEN", new_token)
-else:
-    print("⚠️ No new token found in agent output — reusing current token next cycle")
-
-print("✅ Trading cycle complete")
+      - name: Run Trading Session
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          QUESTRADE_REFRESH_TOKEN: ${{ secrets.QUESTRADE_REFRESH_TOKEN }}
+          GH_PUSH_TOKEN: ${{ secrets.GH_PUSH_TOKEN }}
+          AGENT_ID: ${{ secrets.TRADING_AGENT_ID }}
+          ENVIRONMENT_ID: ${{ secrets.TRADING_ENVIRONMENT_ID }}
+        run: python trading_trigger.py 2>&1
