@@ -28,8 +28,6 @@
   }
   a { color: var(--cyan); text-decoration: none; }
   a:hover { text-decoration: underline; }
-
-  /* Header */
   .header {
     background: linear-gradient(135deg, #0a0e1a 0%, #0d1f3c 100%);
     border-bottom: 1px solid var(--border);
@@ -51,17 +49,14 @@
   }
   .brand-name { font-weight: 700; font-size: 16px; letter-spacing: 0.5px; }
   .brand-sub { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.2px; }
-
   .status {
     display: flex; align-items: center; gap: 10px;
-    background: rgba(255,167,38,0.08);
-    border: 1px solid rgba(255,167,38,0.4);
+    background: rgba(0,230,118,0.08);
+    border: 1px solid rgba(0,230,118,0.4);
     padding: 7px 14px; border-radius: 999px;
     font-size: 12px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase;
+    color: var(--green);
   }
-  .status.live { background: rgba(0,230,118,0.08); border-color: rgba(0,230,118,0.4); color: var(--green); }
-  .status.closed { background: rgba(255,167,38,0.08); border-color: rgba(255,167,38,0.4); color: var(--orange); }
-  .status.weekend { background: rgba(136,146,164,0.08); border-color: rgba(136,146,164,0.3); color: var(--muted); }
   .pulse {
     width: 8px; height: 8px; border-radius: 50%;
     background: currentColor;
@@ -73,25 +68,20 @@
     70% { box-shadow: 0 0 0 8px transparent; opacity: 0.4; }
     100% { box-shadow: 0 0 0 0 transparent; opacity: 1; }
   }
-
   .meta {
     display: flex; flex-direction: column; align-items: flex-end; gap: 2px;
     font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px;
   }
   .meta .countdown { color: var(--cyan); font-weight: 600; font-size: 12px; }
-
-  /* Layout */
   .container { padding: 22px 28px 60px; max-width: 1640px; margin: 0 auto; }
   .row { display: grid; gap: 18px; margin-bottom: 18px; }
   .row.r4 { grid-template-columns: repeat(4, 1fr); }
   .row.r-2-1 { grid-template-columns: 2fr 1fr; }
   .row.r1 { grid-template-columns: 1fr; }
-
   @media (max-width: 1100px) {
     .row.r4 { grid-template-columns: repeat(2, 1fr); }
     .row.r-2-1 { grid-template-columns: 1fr; }
   }
-
   .card {
     background: var(--card);
     border: 1px solid var(--border);
@@ -122,18 +112,13 @@
   .toggle:hover { color: var(--cyan); border-color: var(--cyan); }
   .card-body { padding: 18px; }
   .card.collapsed .card-body { display: none; }
-
-  /* Stat cards */
   .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.2px; font-weight: 600; }
   .stat-value { font-size: 26px; font-weight: 700; margin-top: 6px; letter-spacing: -0.5px; }
   .stat-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
   .stat-sub.green { color: var(--green); }
   .stat-sub.red { color: var(--red); }
-
   .stat-card { padding: 18px 20px; position: relative; }
   .stat-card .spark { margin-top: 10px; }
-
-  /* Tables */
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
   th {
     text-align: left; font-size: 11px; text-transform: uppercase;
@@ -157,7 +142,6 @@
     border-radius: 4px; background: rgba(0,212,255,0.1);
     color: var(--cyan); font-weight: 700; font-size: 12px; letter-spacing: 0.5px;
   }
-
   .badge {
     display: inline-block; padding: 3px 9px; border-radius: 4px;
     font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
@@ -166,8 +150,6 @@
   .badge.sell { background: rgba(255,23,68,0.15); color: var(--red); }
   .badge.hold { background: rgba(136,146,164,0.15); color: var(--muted); }
   .badge.warn { background: rgba(255,167,38,0.15); color: var(--orange); }
-
-  /* Search */
   .search {
     display: flex; align-items: center; gap: 8px;
     background: rgba(0,0,0,0.25);
@@ -184,21 +166,18 @@
     flex: 1;
   }
   .search svg { color: var(--muted); }
-
-  /* Empty state */
   .empty {
     padding: 32px 20px; text-align: center; color: var(--muted);
   }
   .empty svg { margin-bottom: 10px; opacity: 0.6; }
   .empty .title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
   .empty .sub { font-size: 12px; }
-
-  /* Tabs */
   .tabs {
     display: flex; gap: 6px;
     border-bottom: 1px solid var(--border);
     padding: 0 18px;
     background: rgba(0,0,0,0.15);
+    overflow-x: auto;
   }
   .tab {
     padding: 12px 18px;
@@ -209,6 +188,7 @@
     border-bottom: 2px solid transparent;
     margin-bottom: -1px;
     transition: all 0.15s;
+    white-space: nowrap;
   }
   .tab:hover { color: var(--text); }
   .tab.active { color: var(--cyan); border-bottom-color: var(--cyan); }
@@ -228,8 +208,6 @@
   .news-bullet { width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); margin-top: 8px; flex-shrink: 0; }
   .news-head { font-size: 13px; font-weight: 500; color: var(--text); line-height: 1.5; }
   .news-src { font-size: 11px; color: var(--muted); margin-top: 3px; letter-spacing: 0.5px; }
-
-  /* Watchlist / signals */
   .signal {
     padding: 12px 14px;
     border: 1px solid var(--border);
@@ -247,23 +225,6 @@
   }
   .signal-bar > div { height: 100%; border-radius: 2px; transition: width 0.6s; }
   .signal-reason { font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
-
-  /* Order card */
-  .order-card {
-    background: rgba(0,0,0,0.18);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 14px 16px;
-    display: grid;
-    grid-template-columns: auto 90px auto auto auto 1fr;
-    gap: 14px;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-  .order-card:last-child { margin-bottom: 0; }
-  .small-mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px; }
-
-  /* Activity feed */
   .activity-item {
     padding: 10px 0;
     border-bottom: 1px solid rgba(30,45,74,0.4);
@@ -272,12 +233,8 @@
     display: flex; gap: 10px;
   }
   .activity-time { color: var(--cyan); font-family: ui-monospace, monospace; flex-shrink: 0; }
-
-  /* Sparkline / pie */
   .spark-svg { width: 100%; height: 36px; display: block; }
   .pie-svg { width: 56px; height: 56px; }
-  
-  /* Footer */
   .footer { text-align: center; color: var(--muted); font-size: 11px; padding: 30px 0 10px; letter-spacing: 0.5px; }
 </style>
 </head>
@@ -291,24 +248,24 @@
       <div class="brand-sub">Autonomous · Questrade · Account 53826201</div>
     </div>
   </div>
-  <div class="status live" id="status-badge">
+  <div class="status">
     <span class="pulse"></span>
-    <span id="status-text">LIVE TRADING</span>
+    <span>LIVE TRADING</span>
   </div>
   <div class="meta">
-    <div>Last updated <span id="updated">2026-05-11 14:27 ET</span></div>
+    <div>Last updated <span id="updated">2026-05-11 14:43 ET</span></div>
     <div class="countdown">Refreshing in <span id="cd">60</span>s</div>
   </div>
 </div>
 
 <div class="container">
 
-  <!-- ROW 1: KPI cards -->
+  <!-- ROW 1 -->
   <div class="row r4">
 
     <div class="card stat-card">
       <div class="stat-label">Total Equity</div>
-      <div class="stat-value" id="kpi-equity">$173.12</div>
+      <div class="stat-value">$173.12</div>
       <div class="stat-sub">CAD $100.00 · USD $73.12</div>
     </div>
 
@@ -326,11 +283,11 @@
 
     <div class="card stat-card">
       <div class="stat-label">P&amp;L Today</div>
-      <div class="stat-value" id="kpi-pnl">$0.00</div>
-      <div class="stat-sub">0 trades · No positions</div>
+      <div class="stat-value">$0.00</div>
+      <div class="stat-sub">0 trades · 2 cycles</div>
       <div class="spark">
         <svg class="spark-svg" viewBox="0 0 200 36" preserveAspectRatio="none">
-          <polyline points="0,18 22,17 44,19 66,18 88,16 110,18 132,17 154,19 176,18 200,18"
+          <polyline points="0,18 22,18 44,18 66,18 88,18 110,18 132,18 154,18 176,18 200,18"
             fill="none" stroke="#00d4ff" stroke-width="1.6"/>
           <circle cx="200" cy="18" r="2.5" fill="#00d4ff"/>
         </svg>
@@ -339,7 +296,7 @@
 
   </div>
 
-  <!-- ROW 2: Positions + Watchlist -->
+  <!-- ROW 2 -->
   <div class="row r-2-1">
 
     <div class="card" data-id="positions-card">
@@ -377,7 +334,7 @@
               <div class="empty">
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
                 <div class="title">No positions yet</div>
-                <div class="sub">Agent is monitoring the market for entries</div>
+                <div class="sub">Agent is monitoring the market for entries that fit $71.51 USD buying power</div>
               </div>
             </td></tr>
           </tbody>
@@ -398,37 +355,37 @@
           </div>
           <div style="text-align:right;">
             <div style="font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1px;">Closes In</div>
-            <div style="font-size:14px; font-weight:600; margin-top:4px;">~1h 33m</div>
+            <div style="font-size:14px; font-weight:600; margin-top:4px;">~1h 17m</div>
           </div>
         </div>
 
         <div style="font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1.2px; font-weight:600; margin-bottom:10px;">Top 3 Candidates</div>
 
-        <div class="signal" title="INTC: Up ~14% premarket on S&P500 movers list. Memory & semi rally continues, AI demand led by Micron/Sandisk.">
+        <div class="signal" title="INTC ~$128: Apple chip-deal speculation. BofA PT raised $56→$96 but kept Underperform. Up ~100% since Apr 23 earnings. Stretched but momentum strong.">
           <div class="signal-head">
-            <div><span class="sym">INTC</span> <span class="signal-name" style="margin-left:6px;">Intel</span></div>
-            <span class="badge buy">+13.96%</span>
+            <div><span class="sym">INTC</span> <span class="signal-name" style="margin-left:6px;">Intel · $128.30</span></div>
+            <span class="badge buy">+3.5%</span>
           </div>
-          <div class="signal-bar"><div style="width:90%; background:#00e676;"></div></div>
-          <div class="signal-reason">AI/chip momentum, S&amp;P500 premarket leader. Signal: STRONG.</div>
+          <div class="signal-bar"><div style="width:88%; background:#00e676;"></div></div>
+          <div class="signal-reason">Apple foundry deal speculation. STRONG signal but price exceeds $71.51 buying power → cannot trade.</div>
         </div>
 
-        <div class="signal" title="MU: Up ~15% premarket. Memory chip rally extending; AI demand fuels Sandisk/Micron rally.">
+        <div class="signal" title="PLUG +14% afternoon — fuel cell technology provider on big single-day move; need price check before sizing.">
           <div class="signal-head">
-            <div><span class="sym">MU</span> <span class="signal-name" style="margin-left:6px;">Micron</span></div>
-            <span class="badge buy">+15.49%</span>
+            <div><span class="sym">PLUG</span> <span class="signal-name" style="margin-left:6px;">Plug Power</span></div>
+            <span class="badge buy">+14%</span>
           </div>
-          <div class="signal-bar"><div style="width:95%; background:#00e676;"></div></div>
-          <div class="signal-reason">Memory chip rally leader; AI demand. Signal: STRONG. Price ~$747 — exceeds buying power.</div>
+          <div class="signal-bar"><div style="width:75%; background:#00e676;"></div></div>
+          <div class="signal-reason">Large single-day move. Sub-$10 historically → fits budget. Monitoring for breakout continuation, watch RSI overbought.</div>
         </div>
 
-        <div class="signal" title="MRNA: Up ~9% on hantavirus case, early-stage vaccine development. Event-driven, volatile.">
+        <div class="signal" title="MRNA $54-58: Hantavirus + flu vaccine. Mean analyst PT $47 = 11% downside. Consensus Hold. 1 share would breach 5% sizing rule.">
           <div class="signal-head">
-            <div><span class="sym">MRNA</span> <span class="signal-name" style="margin-left:6px;">Moderna</span></div>
-            <span class="badge buy">+11.97%</span>
+            <div><span class="sym">MRNA</span> <span class="signal-name" style="margin-left:6px;">Moderna · $54.35</span></div>
+            <span class="badge warn">+12%</span>
           </div>
-          <div class="signal-bar"><div style="width:60%; background:#ffa726;"></div></div>
-          <div class="signal-reason">Hantavirus catalyst, vaccine pipeline. Signal: MODERATE. Price ~$54 — fits USD buying power.</div>
+          <div class="signal-bar"><div style="width:55%; background:#ffa726;"></div></div>
+          <div class="signal-reason">MODERATE signal. Affordable but 1 share = 76% of USD cash → violates 5% rule. Analyst PT $47 = bearish below current price.</div>
         </div>
 
       </div>
@@ -436,7 +393,7 @@
 
   </div>
 
-  <!-- ROW 3: News tabs -->
+  <!-- ROW 3 News -->
   <div class="row r1">
     <div class="card">
       <div class="card-head">
@@ -445,63 +402,63 @@
       </div>
       <div class="tabs" role="tablist">
         <div class="tab active" onclick="showTab(this, 'tab-movers')">Top Movers <span class="count">10</span></div>
-        <div class="tab" onclick="showTab(this, 'tab-news')">Breaking News <span class="count">7</span></div>
+        <div class="tab" onclick="showTab(this, 'tab-news')">Breaking News <span class="count">8</span></div>
         <div class="tab" onclick="showTab(this, 'tab-earnings')">Earnings <span class="count">4</span></div>
         <div class="tab" onclick="showTab(this, 'tab-macro')">Macro <span class="count">5</span></div>
-        <div class="tab" onclick="showTab(this, 'tab-crypto')">Crypto <span class="count">6</span></div>
+        <div class="tab" onclick="showTab(this, 'tab-crypto')">Crypto <span class="count">5</span></div>
       </div>
 
       <div class="tab-panel active" id="tab-movers">
-        <div class="news-item"><div class="news-bullet" style="background:#00e676"></div><div><div class="news-head"><span class="sym">MU</span> Micron +15.49% — Memory chip rally leader, AI demand</div><div class="news-src">$746.81 · S&amp;P500 premarket gainer</div></div></div>
-        <div class="news-item"><div class="news-bullet" style="background:#00e676"></div><div><div class="news-head"><span class="sym">INTC</span> Intel +13.96% — Premarket surge on chip momentum</div><div class="news-src">$124.92 · S&amp;P500 premarket gainer</div></div></div>
-        <div class="news-item"><div class="news-bullet" style="background:#00e676"></div><div><div class="news-head"><span class="sym">MRNA</span> Moderna +11.97% — Hantavirus case, vaccine development</div><div class="news-src">$54.35 · Event-driven</div></div></div>
-        <div class="news-item"><div class="news-bullet" style="background:#00e676"></div><div><div class="news-head"><span class="sym">QCOM</span> Qualcomm +8.17% — Premarket gainer</div><div class="news-src">$219.09</div></div></div>
-        <div class="news-item"><div class="news-bullet" style="background:#00e676"></div><div><div class="news-head"><span class="sym">COHR</span> Coherent +5.03% — AI infrastructure</div><div class="news-src">$335.26</div></div></div>
-        <div class="news-item"><div class="news-bullet" style="background:#00e676"></div><div><div class="news-head"><span class="sym">MNDY</span> Monday.com +26% — Q1 EPS &amp; rev beat, AI platform drove +24% YoY rev to $351.3M</div><div class="news-src">Software/AI</div></div></div>
-        <div class="news-item"><div class="news-bullet" style="background:#00e676"></div><div><div class="news-head"><span class="sym">LITE</span> Lumentum +5% — Joining Nasdaq 100 on May 18, replacing CoStar</div><div class="news-src">$903.80 · Index inclusion</div></div></div>
-        <div class="news-item"><div class="news-bullet" style="background:#ff1744"></div><div><div class="news-head"><span class="sym">APP</span> AppLovin −6.08% — Loser</div><div class="news-src">$468.55</div></div></div>
-        <div class="news-item"><div class="news-bullet" style="background:#ff1744"></div><div><div class="news-head"><span class="sym">MOS</span> Mosaic −3.14% — Loser</div><div class="news-src">$22.19</div></div></div>
-        <div class="news-item"><div class="news-bullet" style="background:#ff1744"></div><div><div class="news-head"><span class="sym">NCLH</span> Norwegian Cruise −9% — Lowered 2026 profit outlook on fuel costs, weak bookings amid Middle East tensions</div><div class="news-src">Cruise / travel</div></div></div>
+        <div class="news-item"><div class="news-bullet" style="background:#00e676"></div><div><div class="news-head"><span class="sym">INTC</span> Intel $128.30 · +3.5% intraday — Apple chip-deal speculation; BofA raised PT $56→$96 (kept Underperform)</div><div class="news-src">Up ~100% since April 23 earnings · Intraday range $123.92–$133.48</div></div></div>
+        <div class="news-item"><div class="news-bullet" style="background:#00e676"></div><div><div class="news-head"><span class="sym">PLUG</span> Plug Power +14% afternoon — fuel cell technology rally</div><div class="news-src">Yahoo Finance</div></div></div>
+        <div class="news-item"><div class="news-bullet" style="background:#00e676"></div><div><div class="news-head"><span class="sym">GLW</span> Corning +10% — BofA added to "US 1 List"; stock +132% YTD</div><div class="news-src">Yahoo Finance</div></div></div>
+        <div class="news-item"><div class="news-bullet" style="background:#00e676"></div><div><div class="news-head"><span class="sym">SONY</span> Sony +6% — JV with TSMC to develop image sensors</div><div class="news-src">CNBC</div></div></div>
+        <div class="news-item"><div class="news-bullet" style="background:#00e676"></div><div><div class="news-head"><span class="sym">MU</span> Micron +3.3% — SK Hynix +12%; Samsung labor strike could hit 3% global memory capacity (Jefferies)</div><div class="news-src">Parameter · Jefferies</div></div></div>
+        <div class="news-item"><div class="news-bullet" style="background:#ffa726"></div><div><div class="news-head"><span class="sym">MRNA</span> Moderna +9–12% — hantavirus + flu vaccine catalysts; resistance $55, support $47.50; analyst PT $47 (Hold)</div><div class="news-src">Benzinga · Yahoo Finance</div></div></div>
+        <div class="news-item"><div class="news-bullet" style="background:#00e676"></div><div><div class="news-head"><span class="sym">LITE</span> Lumentum +4–5% — Nasdaq 100 inclusion May 18 (replacing CoStar)</div><div class="news-src">CNBC</div></div></div>
+        <div class="news-item"><div class="news-bullet" style="background:#00e676"></div><div><div class="news-head"><span class="sym">MNDY</span> Monday.com +26% — Q1 beat; AI platform drove +24% YoY rev to $351.3M</div><div class="news-src">CNBC · MarketScreener</div></div></div>
+        <div class="news-item"><div class="news-bullet" style="background:#ff1744"></div><div><div class="news-head"><span class="sym">MOS</span> Mosaic −5% — Q1 EPS 5¢ vs 24¢ est miss</div><div class="news-src">CNBC</div></div></div>
+        <div class="news-item"><div class="news-bullet" style="background:#ff1744"></div><div><div class="news-head"><span class="sym">WEN</span> Wendy's −3% — JPM downgrade to Underweight, $6 PT (~18% downside)</div><div class="news-src">JPM · Parameter</div></div></div>
       </div>
 
       <div class="tab-panel" id="tab-news">
-        <div class="news-item"><div class="news-bullet"></div><div><div class="news-head">S&amp;P 500 &amp; Nasdaq up ~0.3%, Dow +0.2% as chip stocks extend gains; indexes hit record highs Friday on strong April jobs</div><div class="news-src">Yahoo Finance · CNBC</div></div></div>
-        <div class="news-item"><div class="news-bullet" style="background:#ff1744"></div><div><div class="news-head">Trump rejects Iran's latest peace proposal calling it "TOTALLY UNACCEPTABLE"; says ceasefire is "on life support"</div><div class="news-src">CNBC · Truth Social</div></div></div>
-        <div class="news-item"><div class="news-bullet" style="background:#ffa726"></div><div><div class="news-head">Oil surges — WTI +3.67% to $99.09; Brent +3.42% to $104.71 as Strait of Hormuz tensions persist into month 4 of war</div><div class="news-src">CNBC · Commodities</div></div></div>
-        <div class="news-item"><div class="news-bullet"></div><div><div class="news-head">Goldman's Hatzius: market is "bending, not breaking"; AI boom + fiscal policy supporting rally despite Iran war</div><div class="news-src">Yahoo Finance</div></div></div>
-        <div class="news-item"><div class="news-bullet" style="background:#00e676"></div><div><div class="news-head">Ed Yardeni sees S&amp;P 500 past 8,000; Dan Ives predicts Nasdaq 30,000 as AI rally expands</div><div class="news-src">CNBC analyst calls</div></div></div>
-        <div class="news-item"><div class="news-bullet" style="background:#00e676"></div><div><div class="news-head">Korea KOSPI hits fresh record; combined Korean market cap tops 7,000 trillion won, led by Samsung &amp; SK Hynix</div><div class="news-src">Seoul Economic Daily</div></div></div>
-        <div class="news-item"><div class="news-bullet" style="background:#ff1744"></div><div><div class="news-head">Nintendo plunges ~8% on Switch 2 price hike + weak console sales forecast</div><div class="news-src">CNBC · Tokyo</div></div></div>
+        <div class="news-item"><div class="news-bullet"></div><div><div class="news-head">S&amp;P 500 +0.2%, Nasdaq +0.3%, Dow +0.2% · 219 advancing / 283 declining of 503; tech +1%, energy &amp; materials &gt;+1%</div><div class="news-src">TheStreet · NYSE</div></div></div>
+        <div class="news-item"><div class="news-bullet" style="background:#ff1744"></div><div><div class="news-head">Iran proposed gradual reopening of Strait of Hormuz if US lifts blockade; Trump rejected as "TOTALLY UNACCEPTABLE"</div><div class="news-src">WSJ · Truth Social</div></div></div>
+        <div class="news-item"><div class="news-bullet" style="background:#ffa726"></div><div><div class="news-head">Iran offered to transfer some highly enriched uranium to third country, rejected dismantling nuclear facilities</div><div class="news-src">WSJ</div></div></div>
+        <div class="news-item"><div class="news-bullet" style="background:#ffa726"></div><div><div class="news-head">WTI oil +3.67% to $99.09; Brent +3.42% to $104.71 on Hormuz tensions</div><div class="news-src">CNBC</div></div></div>
+        <div class="news-item"><div class="news-bullet" style="background:#ff1744"></div><div><div class="news-head">Netanyahu: tensions with Iran "aren't over"</div><div class="news-src">Parameter</div></div></div>
+        <div class="news-item"><div class="news-bullet"></div><div><div class="news-head">Treasury yields up ~5bps after soft 3yr auction; Senate procedural vote tonight on Warsh Fed Chair nomination</div><div class="news-src">NYSE</div></div></div>
+        <div class="news-item"><div class="news-bullet" style="background:#00e676"></div><div><div class="news-head">Mary Ann Bartels (Sanctuary Wealth): S&amp;P 500 can reach 10,000–13,000 in three years</div><div class="news-src">CNBC Power Lunch</div></div></div>
+        <div class="news-item"><div class="news-bullet" style="background:#ff1744"></div><div><div class="news-head">Michael Burry warns AI fixation resembles "final stages of dot-com bubble" — "stocks going straight up because they have been going straight up"</div><div class="news-src">CNBC</div></div></div>
       </div>
 
       <div class="tab-panel" id="tab-earnings">
-        <div class="news-item"><div class="news-bullet" style="background:#00d4ff"></div><div><div class="news-head">Week of May 11–15: Cisco Systems, Applied Materials, Oklo (OKLO), USA Rare Earth (USAR), Constellation Energy, Barrick Mining, Simon Property, Circle Internet, Fox Corp, Franco-Nevada</div><div class="news-src">MarketScreener · Weekly calendar</div></div></div>
-        <div class="news-item"><div class="news-bullet" style="background:#00e676"></div><div><div class="news-head">Q1 2026 season: 89% of S&amp;P 500 reported; 84% beat EPS (vs 5y avg 78%); blended revenue growth +11.3% — highest since Q2 2022</div><div class="news-src">FactSet</div></div></div>
-        <div class="news-item"><div class="news-bullet" style="background:#00d4ff"></div><div><div class="news-head">Marquee event: Nvidia (NVDA) reports May 20 — investor expectations high; Blackwell strong; Rubin $1T+ opportunity through 2027</div><div class="news-src">Motley Fool</div></div></div>
-        <div class="news-item"><div class="news-bullet" style="background:#00e676"></div><div><div class="news-head">Recent winners: Monday.com +26%; Airbnb raised guidance; Tyson Foods beat on protein trend</div><div class="news-src">Yahoo Finance Earnings Live</div></div></div>
+        <div class="news-item"><div class="news-bullet" style="background:#00d4ff"></div><div><div class="news-head">This week (May 11–15): CSCO, AMAT, OKLO, USAR, Constellation Energy, Barrick Mining, Simon Property, Circle Internet, Fox Corp, Franco-Nevada</div><div class="news-src">MarketScreener</div></div></div>
+        <div class="news-item"><div class="news-bullet" style="background:#00e676"></div><div><div class="news-head">Q1 2026 season: ~80-85% of S&amp;P 500 reported; 85% beat EPS by avg +19% surprise; aggregate growth revised to +25–28% — 6th straight double-digit growth quarter</div><div class="news-src">Edward Jones · FactSet</div></div></div>
+        <div class="news-item"><div class="news-bullet" style="background:#00e676"></div><div><div class="news-head">Tech leads sectors: EPS +50% YoY; comm services &amp; materials +40%; 10/11 sectors positive — broad-based growth</div><div class="news-src">Edward Jones</div></div></div>
+        <div class="news-item"><div class="news-bullet" style="background:#00d4ff"></div><div><div class="news-head">Marquee: Nvidia (NVDA) reports May 20 — Blackwell strong, Rubin $1T+ opportunity</div><div class="news-src">Motley Fool</div></div></div>
       </div>
 
       <div class="tab-panel" id="tab-macro">
-        <div class="news-item"><div class="news-bullet" style="background:#ffa726"></div><div><div class="news-head"><b>Tue May 12 — April CPI</b>: Consensus headline 3.8% (from 3.3%) due to oil shock; core 2.7% (from 2.6%)</div><div class="news-src">Yahoo Finance · BLS</div></div></div>
-        <div class="news-item"><div class="news-bullet"></div><div><div class="news-head"><b>Wed May 13 — April PPI</b> / Wholesale inflation</div><div class="news-src">BLS</div></div></div>
-        <div class="news-item"><div class="news-bullet"></div><div><div class="news-head"><b>Later this week — Retail Sales</b>: Check on consumer's ability to spend through oil-driven price pressure</div><div class="news-src">Census Bureau</div></div></div>
-        <div class="news-item"><div class="news-bullet" style="background:#00d4ff"></div><div><div class="news-head"><b>Thu May 14 — CLARITY Act markup</b> at Senate Banking Committee (crypto regulation)</div><div class="news-src">Yahoo Finance Daily Wolf</div></div></div>
-        <div class="news-item"><div class="news-bullet"></div><div><div class="news-head">FOMC (Apr 29): "Economic activity expanding at solid pace; job gains low on average; unemployment little changed"</div><div class="news-src">Federal Reserve</div></div></div>
+        <div class="news-item"><div class="news-bullet" style="background:#ffa726"></div><div><div class="news-head"><b>Tue May 12 — April CPI</b>: Consensus headline 3.8% (from 3.3%) on oil shock; core 2.7% (from 2.6%)</div><div class="news-src">Yahoo Finance · BLS</div></div></div>
+        <div class="news-item"><div class="news-bullet"></div><div><div class="news-head"><b>Wed May 13 — April PPI</b> wholesale inflation</div><div class="news-src">BLS</div></div></div>
+        <div class="news-item"><div class="news-bullet"></div><div><div class="news-head"><b>Later this week — Retail Sales</b>: consumer check through inflation pain</div><div class="news-src">Census Bureau</div></div></div>
+        <div class="news-item"><div class="news-bullet" style="background:#00d4ff"></div><div><div class="news-head"><b>Thu May 14 — CLARITY Act markup</b> at Senate Banking Committee</div><div class="news-src">Yahoo Finance</div></div></div>
+        <div class="news-item"><div class="news-bullet"></div><div><div class="news-head"><b>Tonight</b> — Senate procedural vote on Kevin Warsh Fed Chair nomination</div><div class="news-src">NYSE</div></div></div>
       </div>
 
       <div class="tab-panel" id="tab-crypto">
-        <div class="news-item"><div class="news-bullet" style="background:#ffa726"></div><div><div class="news-head"><b>BTC ~$81,029</b> +0.70% 24h — Holding $80K support; briefly topped $82,400 then slipped on Iran tensions</div><div class="news-src">CoinGecko · CoinDesk</div></div></div>
+        <div class="news-item"><div class="news-bullet" style="background:#ffa726"></div><div><div class="news-head"><b>BTC ~$81,029</b> +0.70% 24h — Holding $80K support; consolidating $79-95K</div><div class="news-src">CoinGecko</div></div></div>
         <div class="news-item"><div class="news-bullet" style="background:#00e676"></div><div><div class="news-head"><b>ETH ~$2,350</b> — Trading above $2,300 despite resistance</div><div class="news-src">CoinGecko</div></div></div>
-        <div class="news-item"><div class="news-bullet" style="background:#00e676"></div><div><div class="news-head"><b>XRP $1.45</b> +2.5% — Breakout above $1.45 on volume; profit-taking emerged at highs</div><div class="news-src">CoinDesk</div></div></div>
-        <div class="news-item"><div class="news-bullet" style="background:#00e676"></div><div><div class="news-head"><b>SUI +20%</b> — Bullish breakout on aggressive buying + institutional staking announcement</div><div class="news-src">Coinpedia</div></div></div>
-        <div class="news-item"><div class="news-bullet"></div><div><div class="news-head">Bitcoin funds captured $700M institutional flow; Strategy bought 535 BTC for $43M</div><div class="news-src">CoinDesk · MicroStrategy</div></div></div>
-        <div class="news-item"><div class="news-bullet" style="background:#ff1744"></div><div><div class="news-head">Iran tensions caused $393M in crypto contract liquidations; volatility expected elevated all week</div><div class="news-src">CoinGecko</div></div></div>
+        <div class="news-item"><div class="news-bullet" style="background:#00e676"></div><div><div class="news-head"><b>XRP $1.45</b> +2.5% breakout; <b>SUI +20%</b> on institutional staking</div><div class="news-src">CoinDesk · Coinpedia</div></div></div>
+        <div class="news-item"><div class="news-bullet"></div><div><div class="news-head">Bitcoin funds captured $700M; Strategy bought 535 BTC for $43M</div><div class="news-src">CoinDesk</div></div></div>
+        <div class="news-item"><div class="news-bullet" style="background:#ff1744"></div><div><div class="news-head">$393M crypto contract liquidations on Iran tensions</div><div class="news-src">CoinGecko</div></div></div>
       </div>
 
     </div>
   </div>
 
-  <!-- ROW 4: Trades + Agent analysis -->
+  <!-- ROW 4 -->
   <div class="row r-2-1">
 
     <div class="card">
@@ -533,7 +490,7 @@
               <div class="empty">
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
                 <div class="title">No trades today</div>
-                <div class="sub">Session just started · awaiting high-conviction signals</div>
+                <div class="sub">2 cycles run · all decisions = HOLD CASH</div>
               </div>
             </td></tr>
           </tbody>
@@ -551,23 +508,24 @@
           <div class="stat-label">Current Decision</div>
           <div style="margin-top:8px; display:flex; gap:8px; align-items:center;">
             <span class="badge hold">HOLD CASH</span>
-            <span style="font-size:12px; color:var(--muted);">No trade this cycle</span>
+            <span style="font-size:12px; color:var(--muted);">Cycle 2 · same as cycle 1</span>
           </div>
         </div>
 
         <div style="font-size:12px; color:var(--text); line-height:1.6;">
           <div style="margin-bottom:10px;"><b style="color:var(--cyan);">Reasoning:</b></div>
           <ul style="padding-left:18px; color:var(--muted);">
-            <li>Strongest signals (INTC $125, MU $747) exceed USD buying power ($71.51)</li>
-            <li>April CPI tomorrow — high event risk (consensus 3.8% headline)</li>
-            <li>Iran ceasefire "on life support" — geopolitical tail risk</li>
-            <li>S&amp;P 500 at record highs; mean-reversion risk</li>
-            <li>MRNA fits budget at ~$54 but event-driven (hantavirus) volatility</li>
+            <li>INTC $128 + MU $747 + GLW $187 all exceed $71.51 USD buying power</li>
+            <li>MRNA fits but 1 share = 76% of cash → violates 5% sizing rule</li>
+            <li>MRNA analyst PT $47 = 11% downside; consensus Hold</li>
+            <li>April CPI <b>tomorrow</b> — consensus 3.8% headline → high event risk</li>
+            <li>Iran ceasefire "on life support"; Netanyahu: "aren't over"</li>
+            <li>Burry dot-com warning vs Bartels S&amp;P 10–13K — disagreement at the top</li>
           </ul>
 
           <div style="margin-top:14px; padding:10px; background:rgba(0,212,255,0.06); border-left:2px solid var(--cyan); border-radius:4px;">
             <b style="color:var(--cyan); font-size:11px; letter-spacing:1px; text-transform:uppercase;">Next Action</b>
-            <div style="margin-top:6px; font-size:12px;">Preserve capital. Re-evaluate post-CPI. Watch MRNA for entry under $50 or breakout above $58.</div>
+            <div style="margin-top:6px; font-size:12px;">Preserve capital through CPI. Watch PLUG for a price entry under $10. Re-evaluate MRNA on pullback to $47.50 support.</div>
           </div>
         </div>
       </div>
@@ -575,7 +533,7 @@
 
   </div>
 
-  <!-- ROW 5: Open orders -->
+  <!-- ROW 5 Open orders -->
   <div class="row r1">
     <div class="card">
       <div class="card-head">
@@ -592,7 +550,7 @@
     </div>
   </div>
 
-  <!-- ROW 6: Activity feed -->
+  <!-- ROW 6 Activity -->
   <div class="row r1">
     <div class="card" data-id="activity-card">
       <div class="card-head">
@@ -600,12 +558,14 @@
         <button class="toggle" onclick="toggleCard(this)">▼</button>
       </div>
       <div class="card-body">
-        <div class="activity-item"><span class="activity-time">14:27</span><span>Dashboard regenerated · cycle complete</span></div>
-        <div class="activity-item"><span class="activity-time">14:27</span><span>Market research compiled · 5 web sources · 3 top candidates identified</span></div>
-        <div class="activity-item"><span class="activity-time">14:27</span><span>Account data refreshed · 0 positions · 0 open orders</span></div>
-        <div class="activity-item"><span class="activity-time">14:27</span><span>Questrade auth successful · access token rotated · refresh token saved</span></div>
-        <div class="activity-item"><span class="activity-time">14:27</span><span>Decision: HOLD CASH — Strong candidates outside buying power range</span></div>
-        <div class="activity-item"><span class="activity-time">14:27</span><span>Session bootstrap complete · workspace initialized</span></div>
+        <div class="activity-item"><span class="activity-time">14:43</span><span>Cycle 2 complete · decision: HOLD CASH (same as cycle 1)</span></div>
+        <div class="activity-item"><span class="activity-time">14:43</span><span>Fresh intraday research compiled · INTC $128 / MRNA $54 / PLUG +14% / GLW +10%</span></div>
+        <div class="activity-item"><span class="activity-time">14:42</span><span>Dashboard regenerated with fresh data</span></div>
+        <div class="activity-item"><span class="activity-time">14:41</span><span>GitHub push SUCCEEDED with new token (commit 6dae3a3) · user authenticated as snapscenes4-hue</span></div>
+        <div class="activity-item"><span class="activity-time">14:40</span><span>New GitHub token received and validated · old token was 401 Bad credentials</span></div>
+        <div class="activity-item"><span class="activity-time">14:40</span><span>Questrade access token rotated · new refresh token saved</span></div>
+        <div class="activity-item"><span class="activity-time">14:38</span><span>Cycle 1 · decision: HOLD CASH · 0 orders placed</span></div>
+        <div class="activity-item"><span class="activity-time">14:27</span><span>Session bootstrapped · all 10 steps initialized</span></div>
       </div>
     </div>
   </div>
@@ -615,7 +575,6 @@
 </div>
 
 <script>
-  // Auto-refresh countdown
   let cd = 60;
   const cdEl = document.getElementById('cd');
   setInterval(() => {
@@ -623,7 +582,6 @@
     cdEl.textContent = cd;
   }, 1000);
 
-  // Collapse persistence
   document.querySelectorAll('.card[data-id]').forEach(card => {
     const id = card.getAttribute('data-id');
     if (localStorage.getItem('collapsed:' + id) === '1') {
@@ -641,7 +599,6 @@
     if (id) localStorage.setItem('collapsed:' + id, card.classList.contains('collapsed') ? '1' : '0');
   }
 
-  // Tab switching
   function showTab(el, panelId) {
     const tabs = el.parentElement.querySelectorAll('.tab');
     tabs.forEach(t => t.classList.remove('active'));
@@ -651,7 +608,6 @@
     container.querySelector('#' + panelId).classList.add('active');
   }
 
-  // Filter table
   function filterTable(tableId, q) {
     q = (q || '').toLowerCase().trim();
     const tbl = document.getElementById(tableId);
@@ -663,7 +619,6 @@
     });
   }
 
-  // Sort table
   function sortTable(th, colIdx, kind) {
     const table = th.closest('table');
     const tbody = table.querySelector('tbody');
@@ -688,7 +643,6 @@
     rows.forEach(r => tbody.appendChild(r));
   }
 
-  // Add row-hover class
   document.querySelectorAll('tbody tr').forEach(tr => tr.classList.add('row-hover'));
 </script>
 </body>
